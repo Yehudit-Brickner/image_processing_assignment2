@@ -174,15 +174,21 @@ def edgeDetectionZeroCrossingLOG(img: np.ndarray) -> np.ndarray:
     :param img: Input image
     :return: opencv solution, my implementation
     """
-    smooth=np.array([[1,2,1],[2,4,2],[1,2,1]])
+    # smooth=np.array([[1,2,1],[2,4,2],[1,2,1]])
+    # # smooth=smooth/np.sum(smooth)
+    smooth=np.array([[1,4,7,4,1],[4,16,26,16,4],[7,26,41,26,7],[4,16,26,16,4],[1,4,7,4,1]])
+    #
+    #
+    # # smooth = smooth / np.sum(smooth)
     img_smothed=conv2D(img,smooth)
+
     lap_filter=np.array([[0,1,0],[1,-4,1],[0,1,0]])
     filterd=conv2D(img_smothed,lap_filter)
     plt.imshow(filterd)
     plt.show()
     shape=filterd.shape
     row=shape[0]
-    col=shape[0]
+    col=shape[1]
     new_img=np.zeros(shape)
     #we will not include the edges so that we can find the other edges easier
     for i in range (1,row-1):
