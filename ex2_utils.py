@@ -102,51 +102,70 @@ def conv2D(in_image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     # return new_img_blurred
 
 
+    shape_ker = kernel.shape
+    ker_row = shape_ker[0]
+    ker_col = shape_ker[1]
+
+    shape_img = in_image.shape
+    # print(shape_img)
+    img_row = shape_img[0]
+    img_col = shape_img[1]
+
+    new_img_blurred = np.zeros(shape_img)
+    # print(kernel)
+    kernel = np.flip(kernel)
+    # print(kernel)
+    r_skip = math.floor(ker_row / 2)
+    c_skip = math.floor(ker_col / 2)
+
+    padded_image = cv2.copyMakeBorder(in_image, r_skip, r_skip, c_skip, c_skip, cv2.BORDER_REPLICATE, None, value=0)
+    for i in range(img_row):
+        for j in range(img_col):
+            num = 0
+            for k in range(ker_row):
+                for l in range(ker_col):
+                    num = num + (kernel[k][l]) * (padded_image[i+k][j+l])
+            new_img_blurred[i][j] = num
+    new_img_blurred=np.round(new_img_blurred)
+    return new_img_blurred
 
 
-
-
-
+def conv2D_REFLECT(in_image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+    """
+    Convolve a 2-D array with a given kernel
+    :param in_image: 2D image
+    :param kernel: A kernel
+    :return: The convolved image
+    """
 
     shape_ker = kernel.shape
     ker_row = shape_ker[0]
     ker_col = shape_ker[1]
 
     shape_img = in_image.shape
-    print(shape_img)
     img_row = shape_img[0]
     img_col = shape_img[1]
 
     new_img_blurred = np.zeros(shape_img)
-    print(kernel)
-    kernel = np.flip(kernel)
-    print(kernel)
     r_skip = math.floor(ker_row / 2)
     c_skip = math.floor(ker_col / 2)
 
-    padded_image = cv2.copyMakeBorder(in_image, r_skip, r_skip, c_skip, c_skip, cv2.BORDER_REPLICATE, None, value=0)
-    mini=5
-    minj=5
-    maxj=5
-    maxi=5
+    padded_image = cv2.copyMakeBorder(in_image, r_skip, r_skip, c_skip, c_skip, cv2.BORDER_REFLECT_101, None, value=0)
     for i in range(img_row):
         for j in range(img_col):
             num = 0
-            if(i<mini):
-                mini=i
-            if (i > maxi):
-                maxi = i
-            if (j < minj):
-                minj = j
-            if (j > maxj):
-                maxj=j
-
             for k in range(ker_row):
                 for l in range(ker_col):
                     num = num + (kernel[k][l]) * (padded_image[i+k][j+l])
             new_img_blurred[i][j] = num
-    print(mini, minj,maxi,maxj)
     return new_img_blurred
+
+
+
+
+
+
+
 
 
 
@@ -158,69 +177,10 @@ def convDerivative(in_image: np.ndarray) -> (np.ndarray, np.ndarray):
     """
     ker = np.array([[1, 0, -1]])
     kerT = np.transpose(ker)
-    img_x = conv2D(in_image, ker)
-    # print("derivative x")
-    # plt.imshow(img_x, cmap='gray')
-    # plt.show()
-    img_y = conv2D(in_image, kerT)
-    # print("derivative y")
-    # plt.imshow(img_y, cmap='gray')
-    # plt.show()
-
-    MagG = np.sqrt((img_x * img_x )+ (img_y * img_y))
-    # print("magnitude")
-    # plt.imshow(MagG, cmap='gray')
-    # plt.show()
-    #     print(MagG)
-
-    shape=img_x.shape
-    count=0
-    for i in range (shape[0]):
-        for j in range(shape[1]):
-            if img_x[i][j]==0:
-                count=count+1
-    print("count img x pixcel = 0", count)
-    count = 0
-    for i in range(shape[0]):
-        for j in range(shape[1]):
-            if img_y[i][j] == 0:
-                count = count + 1
-    print("count img y pixcel = 0", count)
-
-    # img_x[img_x == 0] = 0.000000000001
-    # img_y[img_y == 0] = 0.000000000001
-
-    # img_x_d=np.deg2rad(img_x)
-    # img_y_d = np.deg2rad(img_y)
-
-    # print("derivative x no 0")
-    # plt.imshow(img_x, cmap='gray')
-    # plt.show()
-    # print("derivative y no 0")
-    # plt.imshow(img_y, cmap='gray')
-    # plt.show()
-
-    # print()
-    # print()
+    img_x = conv2D_REFLECT(in_image, ker)
+    img_y = conv2D_REFLECT(in_image, kerT)
+    MagG = np.sqrt((img_x * img_x ) + (img_y * img_y))
     dirG = np.arctan2(img_y, img_x).astype(np.float64)
-    # print("direction")
-    # plt.imshow(dirG, cmap='gray')
-    # plt.show()
-
-    X = cv2.filter2D(in_image, -1, ker)
-    Y = cv2.filter2D(in_image, -1, kerT)
-    count = 0
-    for i in range(shape[0]):
-        for j in range(shape[1]):
-            if X[i][j] == 0:
-                count = count + 1
-    print("count img x pixcel = 0", count)
-    count = 0
-    for i in range(shape[0]):
-        for j in range(shape[1]):
-            if Y[i][j] == 0:
-                count = count + 1
-    print("count img y pixcel = 0", count)
     return dirG, MagG
 
 
