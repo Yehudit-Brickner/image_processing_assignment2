@@ -232,6 +232,38 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                 [(x,y,radius),(x,y,radius),...]
     """
 
+    # smooth=np.array([[1,2,1],[2,4,2],[1,2,1]])
+    # # smooth=smooth/np.sum(smooth)
+    smooth = np.array([[1, 4, 7, 4, 1], [4, 16, 26, 16, 4], [7, 26, 41, 26, 7], [4, 16, 26, 16, 4], [1, 4, 7, 4, 1]])
+    # # smooth = smooth / np.sum(smooth)
+    img_smothed = conv2D(img, smooth)
+
+    lap_filter = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]])
+    filterd = conv2D(img_smothed, lap_filter)
+    plt.imshow(filterd)
+    plt.show()
+    shape = filterd.shape
+    row = shape[0]
+    col = shape[1]
+    pi=math.pi
+    mapp=dict()
+    for i in range(row):
+        for j in range(col):
+            for r in range(min_radius,max_radius+1):
+                for deg in range(360):
+                    a= i-r*math.sin(deg*pi/180)
+                    b=j-r*math.cos(deg*pi/180)
+                    key=(a,b,r)
+                    if key in mapp.keys():
+                         mapp[key] = mapp.get(key, 0) + 1
+
+                    else:
+                        mapp[key]=1
+
+    print(mapp)
+
+
+
     return
 
 
