@@ -15,17 +15,18 @@ def conv1D(in_signal: np.ndarray, k_size: np.ndarray) -> np.ndarray:
         k_size = in_signal.copy()
         in_signal = temp.copy()
     shift = (len(k_size) - 1)
-    flip = np.ones(len(k_size))
+    # flip = np.ones(len(k_size))
     new = np.zeros(len(in_signal) + shift)
-    for i in range(len(k_size)):  # flipping the k_size vector
-        flip[len(k_size) - 1 - i] = k_size[i]
+    # for i in range(len(k_size)):  # flipping the k_size vector
+    #     flip[len(k_size) - 1 - i] = k_size[i]
+    flip = np.flip(k_size)
     padded = in_signal.copy()
     for k in range(shift): # padding the vector with 0
         padded = np.insert(0, 0, padded)
         padded = np.append(0, padded)
         # print(padded)
     for i in range(len(padded) - shift):
-        num = 0;
+        num = 0
         for k in range(len(k_size)):
             num += flip[k] * padded[i + k]
         # print(num)
@@ -43,65 +44,142 @@ def conv2D(in_image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     :param kernel: A kernel
     :return: The convolved image
     """
-    plt.imshow(in_image, cmap='gray')
-    plt.show()
+    # plt.imshow(in_image, cmap='gray')
+    # plt.show()
+    # shape_ker = kernel.shape
+    # # print(shape_ker)
+    # ker_row = shape_ker[0]
+    # ker_col = shape_ker[1]
+    # # print(shape_ker, ker_row, ker_col)
+    # shape_img = in_image.shape
+    # img_row = shape_img[0]
+    # img_col = shape_img[1]
+    # # print(shape_img, img_row, img_col)
+    # new_img_blurred = np.zeros(shape_img)
+    # new_img_check = np.zeros(shape_img)
+    # # plt.imshow(new_img_blurred, cmap='gray')
+    # # plt.show()
+    # kernel=np.flip(kernel)
+    # for i in range(img_row):
+    #     for j in range(img_col):
+    # #         #             print("i= ",i, "j= ",j)
+    #         num = 0
+    #         row = i - math.floor(ker_row / 2)
+    #         col = j - math.floor(ker_col / 2)
+    #
+    #         if (row >= math.floor(ker_row / 2) and row < img_row - ker_row and col >= math.floor(ker_col / 2) and col < img_col - ker_col):
+    #             # print("one of the above is true: this row is in [2,763]", row, "and this col is in [2,1147]", col)
+    #             for k in range(ker_row):
+    #                 for l in range(ker_col):
+    #                     #                         print("i= ",i, "j= ",j, "k= ",k, "l ",l ,"gvhgvhjbj")
+    #                     num = num + (kernel[k][l]) * (in_image[row + k][col + l])
+    #             new_img_blurred[i][j] = num
+    #             new_img_check[i][j] = 1
+    #         else:
+    #             # print("one of the above is true: this row is not in [2,763]", row, "and this col is not in [2,1147]",col)
+    #             for k in range(ker_row):
+    #                 for l in range(ker_col):
+    #                     #                         print("i= ",i, "j= ",j, "k= ",k, "l ",l)
+    #                     if (row + k >= 0 and row + k < img_row and col + j >= 0 and col + j < img_col):
+    #                         num = num + (kernel[k][l]) * (in_image[row + k][col + l])
+    #                     else:
+    #                         r = row + k
+    #                         c = col + l
+    #                         if row + k < 0:
+    #                             r = 0;
+    #                         elif row + k >= img_row:
+    #                             r = img_row - 1
+    #                         if col + l < 0:
+    #                             c = 0
+    #                         elif col + l >= img_col:
+    #                             c = img_col - 1
+    #                         num = num + (kernel[k][l]) * (in_image[r][c])
+    #             new_img_blurred[i][j] = num
+    #             new_img_check[i][j] = 1
+    # # print("new_img_blurred")
+    # # plt.imshow(new_img_blurred, cmap='gray')
+    # # plt.show()
+    # return new_img_blurred
+
+
+
+
+
+
+
+
     shape_ker = kernel.shape
-    print(shape_ker)
+    #     print(shape_ker)
     ker_row = shape_ker[0]
     ker_col = shape_ker[1]
-    print(shape_ker, ker_row, ker_col)
+    #     print(shape_ker, ker_row,ker_col)
     shape_img = in_image.shape
     img_row = shape_img[0]
     img_col = shape_img[1]
-    print(shape_img, img_row, img_col)
+    #     print(shape_img, img_row,img_col)
     new_img_blurred = np.zeros(shape_img)
-    new_img_check = np.zeros(shape_img)
-    # plt.imshow(new_img_blurred, cmap='gray')
-    # plt.show()
+    # new_img_check = np.zeros(shape_img)
+    #     plt.imshow(new_img_blurred,cmap='gray')
+    #     plt.show()
+    # print(kernel)
+    kernel = np.flip(kernel)
+    # print(kernel)
+
+    r_skip = math.floor(ker_row / 2)
+    c_skip = math.floor(ker_col / 2)
+
+    padded_image = cv2.copyMakeBorder(in_image, r_skip, r_skip, c_skip, c_skip, cv2.BORDER_REPLICATE, None, value=0)
 
     for i in range(img_row):
         for j in range(img_col):
-            #             print("i= ",i, "j= ",j)
+            #    print("i= ",i, "j= ",j)
             num = 0
-            row = i - math.floor(ker_row / 2)
-            col = j - math.floor(ker_col / 2)
+            # row = i +math.floor(ker_row / 2)
+            # col = j + math.floor(ker_col / 2)
 
-            if (row >= math.floor(ker_row / 2) and row < img_row - ker_row and col >= math.floor(ker_col / 2) and col < img_col - ker_col):
-                # print("one of the above is true: this row is in [2,763]", row, "and this col is in [2,1147]", col)
-                for k in range(ker_row):
-                    for l in range(ker_col):
-                        #                         print("i= ",i, "j= ",j, "k= ",k, "l ",l ,"gvhgvhjbj")
-                        num = num + (kernel[k][l]) * (in_image[row + k][col + l])
-                new_img_blurred[i][j] = num
-                new_img_check[i][j] = 1
-            else:
-                # print("one of the above is true: this row is not in [2,763]", row, "and this col is not in [2,1147]",col)
-                for k in range(ker_row):
-                    for l in range(ker_col):
-                        #                         print("i= ",i, "j= ",j, "k= ",k, "l ",l)
-                        if (row + k >= 0 and row + k < img_row and col + j >= 0 and col + j < img_col):
-                            num = num + (kernel[k][l]) * (in_image[row + k][col + l])
-                        else:
-                            r = row + k
-                            c = col + l
-                            if row + k < 0:
-                                r = 0;
-                            elif row + k >= img_row:
-                                r = img_row - 1
-                            if col + l < 0:
-                                c = 0
-                            elif col + l >= img_col:
-                                c = img_col - 1
-                            num = num + (kernel[k][l]) * (in_image[r][c])
-                new_img_blurred[i][j] = num
-                new_img_check[i][j] = 1
-    # print("new_img_blurred")
-    # plt.imshow(new_img_blurred, cmap='gray')
-    # plt.show()
+            # if(row>=math.floor(ker_row/2) and row<img_row-ker_row and col>=math.floor(ker_col/2) and col<img_col-ker_col):
+            #     print("one of the above is true: this row is in [2,763]" ,row, "and this col is in [2,1147]",col)
+            for k in range(ker_row):
+                for l in range(ker_col):
+                    #     print("i= ",i, "j= ",j, "k= ",k, "l ",l ,"gvhgvhjbj")
+                    num = num + (kernel[k][l]) * (padded_image[i+k][j+l])
+            new_img_blurred[i][j] = num
+            # new_img_check[i][j] = 1
+    #             else:
+    # #                 print("one of the above is true: this row is not in [2,763]" ,row, "and this col is not in [2,1147]",col)
+    #                 for k in range(ker_row):
+    #                     for l in range(ker_col):
+    # #                         print("i= ",i, "j= ",j, "k= ",k, "l ",l)
+    #                         if(row+k>=0 and row+k<img_row and col+j>=0 and col+j<img_col):
+    #                             num=num+(kernel[k][l])*(in_image[row+k][col+l])
+    #                         else:
+    #                             r=row+k
+    #                             c=col+l
+    #                             if row+k<0:
+    #                                 r=0;
+    #                             elif row+k>=img_row:
+    #                                 r=img_row-1
+    #                             if col+l<0:
+    #                                 c=0
+    #                             elif col+l>=img_col:
+    #                                 c=img_col-1
+    #                             num=num+(kernel[k][l])*(in_image[r][c])
+    #                 new_img_blurred[i][j]=num
+    #                 new_img_check[i][j]=1
+        # print("new_img_blurred")
+        # plt.imshow(new_img_blurred,cmap='gray')
+        # plt.show()
+        # print("check")
+        # plt.imshow(new_img_check)
+        # plt.show()
+        # sum=0
+        # for i in range(img_row):
+        #     for j in range(img_col):
+        #           sum+=new_img_check[i][j]
+        # print (sum)
 
 
     return new_img_blurred
-
 
 
 
@@ -111,9 +189,43 @@ def convDerivative(in_image: np.ndarray) -> (np.ndarray, np.ndarray):
     :param in_image: Grayscale iamge
     :return: (directions, magnitude)
     """
-    ker =np.array([1,0,-1])
-    print(ker)
-    return
+    ker = np.array([[-1, 0, 1]])
+    kerT = np.transpose(ker)
+    img_x = conv2D(in_image, ker)
+    # print("derivative x")
+    # plt.imshow(img_x, cmap='gray')
+    # plt.show()
+    img_y = conv2D(in_image, kerT)
+    # print("derivative y")
+    # plt.imshow(img_y, cmap='gray')
+    # plt.show()
+
+    MagG = np.sqrt((img_x * img_x )+ (img_y * img_y))
+    # print("magnitude")
+    # plt.imshow(MagG, cmap='gray')
+    # plt.show()
+    #     print(MagG)
+
+    img_x[img_x == 0] = 0.000000000001
+    img_y[img_y == 0] = 0.000000000001
+
+    img_x_d=np.rad2deg(img_x)
+    img_y_d = np.rad2deg(img_y)
+
+    # print("derivative x no 0")
+    # plt.imshow(img_x, cmap='gray')
+    # plt.show()
+    # print("derivative y no 0")
+    # plt.imshow(img_y, cmap='gray')
+    # plt.show()
+
+    # print()
+    # print()
+    dirG = np.arctan(img_y_d / img_x_d)
+    # print("direction")
+    # plt.imshow(dirG, cmap='gray')
+    # plt.show()
+    return dirG, MagG
 
 
 def blurImage1(in_image: np.ndarray, k_size: int) -> np.ndarray:
