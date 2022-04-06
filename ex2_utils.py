@@ -240,31 +240,70 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
 
     lap_filter = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]])
     filterd = conv2D(img_smothed, lap_filter)
-    plt.imshow(filterd)
-    plt.show()
+    # plt.imshow(filterd)
+    # plt.show()
     shape = filterd.shape
     row = shape[0]
     col = shape[1]
+    rowarr=np.arange(0,row,min_radius/10)
+    print(rowarr)
+    colarr = np.arange(0, col, min_radius / 10)
+    print(colarr)
     pi=math.pi
+    degres=np.arange(0,360,10)
+    print(degres)
+    rad=np.arange(min_radius,max_radius,5)
+    #rad.append(max_radius)
+    print(rad)
     mapp=dict()
-    for i in range(row):
-        for j in range(col):
-            for r in range(min_radius,max_radius+1):
-                for deg in range(360):
+    for i in rowarr:
+        print(i)
+        for j in colarr:
+            for r in rad:
+                for deg in degres:
+    # for i in range(row):
+    #     for j in range(1):
+    #         # for r in range():
+    #         for deg in range(1):
+    #             r=min_radius
                     a= i-r*math.sin(deg*pi/180)
                     b=j-r*math.cos(deg*pi/180)
-                    key=(a,b,r)
+                    a=int(a)
+                    b=int(b)
+                    key = (a, b, r)
+                    # print(key)
                     if key in mapp.keys():
-                         mapp[key] = mapp.get(key, 0) + 1
-
+                        l=mapp.get(key)
+                        l[2]=l[2]+1
+                        mapp[key]=l
                     else:
-                        mapp[key]=1
+                        mapp[key]=[i,j,1]
+                    # print(mapp[key])
 
-    print(mapp)
+    # print(mapp)
+    cir_lst=[]
+    for x in mapp:
+        # print("x=",x)
+        val=mapp.get(x)
+        # print("val=",val)
+        if val[1]>8:
+            # i=x[0]-x[2]*math.sin(val[0]*pi/180)
+            # i=int(i)
+            # i=i%row
+            # j=x[1]-x[2]*math.cos(val[0]*pi/180)
+            # j=int(j)
+            # j=j%col
+            i=val[0]
+            j=val[1]
+            ci=(i,j,x[2])
+            cir_lst.append(ci)
+            print(ci)
+
+    # print(cir_lst)
 
 
 
-    return
+    return cir_lst
 
 
 def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: float, sigma_space: float) -> (
