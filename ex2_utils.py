@@ -10,68 +10,88 @@ def conv1D(in_signal: np.ndarray, k_size: np.ndarray) -> np.ndarray:
     :param k_size: 1-D array as a kernel
     :return: The convolved array
     """
+
+    shift = (len(k_size) - 1)
     flip = np.ones(len(k_size))
-    new = np.zeros(len(in_signal) + (len(k_size) - 1))
+    new = np.zeros(len(in_signal) + shift)
     for i in range(len(k_size)):  # fliiping the k_size vector
         flip[len(k_size) - 1 - i] = k_size[i]
-    #     print("filip " ,flip)
-    #     print("k-size ",k_size)
-    for i in range((0 - len(k_size) + 1), len(in_signal)):
-        #         print(i)
-        if (i < 0):  # if we are at the beginig and need to add zeroes b4 the start of the in signal
-            part = np.zeros(len(k_size))
-            j = 0
-            for k in range(-1 * i):  # fill in 0 at begining
-                part[j] = 0;
-                j = j + 1
-            l = len(k_size) - j
-            for k in range(j, len(k_size)):  # fill in numbers from in signal
-                m = i + len(k_size) - l
-                part[j] = in_signal[i + len(k_size) - l]
-                j = j + 1
-                l = l - 1;
-            num = 0;
-            #             print(part)
-            for k in range(len(k_size)):  # find the new num
-                num += part[k] * flip[k]
-            new[i + len(k_size) - 1] = num
-        #             print(num)
-        #             print(new)
-        #             print()
-        elif (i > (
-                len(in_signal) - len(k_size))):  # if we are at the end and need to add zeroes at the of the in signal
-            part = np.zeros(len(k_size))
-            j = 0
-            m = i
-            for k in range(i, len(in_signal)):  # fill in numbers from in signal
-                part[j] = in_signal[m]
-                m = m + 1
-                j = j + 1
-            # i dont need to add zeros at the end because the array was defalted to zeros
-            num = 0;
-            #             print(part)
-            for k in range(len(k_size)):  # find the new num
-                num += part[k] * flip[k]
-            new[i + len(k_size) - 1] = num
-        #             print(num)
-        #             print(new)
-        #             print()
-        else:
-            j = 0
-            part = np.zeros(len(k_size))
-            for k in range(len(k_size)):
-                part[j] = in_signal[i + k]
-                j = j + 1
-            #             print(part)
-            num = 0
-            for k in range(len(k_size)):  # find the new num
-                num += part[k] * flip[k]
-            new[i + len(k_size) - 1] = num
-    #             print(num)
-    #             print(new)
-    #             print()
-    #     print(new)
+    padded = in_signal.copy()
+    for k in range(shift): # padding the vector with 0
+        padded = np.insert(0, 0, padded)
+        padded = np.append(0, padded)
+        # print(padded)
+    for i in range(len(padded) - shift):
+        num = 0;
+        for k in range(len(k_size)):
+            num += flip[k] * padded[i + k]
+        # print(num)
+        new[i] = num
     return new
+
+
+    # flip = np.ones(len(k_size))
+    # new = np.zeros(len(in_signal) + (len(k_size) - 1))
+    # for i in range(len(k_size)):  # fliiping the k_size vector
+    #     flip[len(k_size) - 1 - i] = k_size[i]
+    # #     print("filip " ,flip)
+    # #     print("k-size ",k_size)
+    # for i in range((0 - len(k_size) + 1), len(in_signal)):
+    #     #         print(i)
+    #     if (i < 0):  # if we are at the beginig and need to add zeroes b4 the start of the in signal
+    #         part = np.zeros(len(k_size))
+    #         j = 0
+    #         for k in range(-1 * i):  # fill in 0 at begining
+    #             part[j] = 0;
+    #             j = j + 1
+    #         l = len(k_size) - j
+    #         for k in range(j, len(k_size)):  # fill in numbers from in signal
+    #             m = i + len(k_size) - l
+    #             part[j] = in_signal[i + len(k_size) - l]
+    #             j = j + 1
+    #             l = l - 1;
+    #         num = 0;
+    #         #             print(part)
+    #         for k in range(len(k_size)):  # find the new num
+    #             num += part[k] * flip[k]
+    #         new[i + len(k_size) - 1] = num
+    #     #             print(num)
+    #     #             print(new)
+    #     #             print()
+    #     elif (i > (
+    #             len(in_signal) - len(k_size))):  # if we are at the end and need to add zeroes at the of the in signal
+    #         part = np.zeros(len(k_size))
+    #         j = 0
+    #         m = i
+    #         for k in range(i, len(in_signal)):  # fill in numbers from in signal
+    #             part[j] = in_signal[m]
+    #             m = m + 1
+    #             j = j + 1
+    #         # i dont need to add zeros at the end because the array was defalted to zeros
+    #         num = 0;
+    #         #             print(part)
+    #         for k in range(len(k_size)):  # find the new num
+    #             num += part[k] * flip[k]
+    #         new[i + len(k_size) - 1] = num
+    #     #             print(num)
+    #     #             print(new)
+    #     #             print()
+    #     else:
+    #         j = 0
+    #         part = np.zeros(len(k_size))
+    #         for k in range(len(k_size)):
+    #             part[j] = in_signal[i + k]
+    #             j = j + 1
+    #         #             print(part)
+    #         num = 0
+    #         for k in range(len(k_size)):  # find the new num
+    #             num += part[k] * flip[k]
+    #         new[i + len(k_size) - 1] = num
+    # #             print(num)
+    # #             print(new)
+    # #             print()
+    # #     print(new)
+
 
 
 def conv2D(in_image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
