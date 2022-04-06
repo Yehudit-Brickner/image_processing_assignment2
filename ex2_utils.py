@@ -3,6 +3,18 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
+
+
+def myID() -> np.int:
+    """
+    Return my ID (not the friend's ID I copied from)
+    :return: int
+    """
+    return 328601018
+
+
+
+
 def conv1D(in_signal: np.ndarray, k_size: np.ndarray) -> np.ndarray:
     """
     Convolve a 1-D array with a given kernel
@@ -44,77 +56,17 @@ def conv2D(in_image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     :param kernel: A kernel
     :return: The convolved image
     """
-    # plt.imshow(in_image, cmap='gray')
-    # plt.show()
-    # shape_ker = kernel.shape
-    # # print(shape_ker)
-    # ker_row = shape_ker[0]
-    # ker_col = shape_ker[1]
-    # # print(shape_ker, ker_row, ker_col)
-    # shape_img = in_image.shape
-    # img_row = shape_img[0]
-    # img_col = shape_img[1]
-    # # print(shape_img, img_row, img_col)
-    # new_img_blurred = np.zeros(shape_img)
-    # new_img_check = np.zeros(shape_img)
-    # # plt.imshow(new_img_blurred, cmap='gray')
-    # # plt.show()
-    # kernel=np.flip(kernel)
-    # for i in range(img_row):
-    #     for j in range(img_col):
-    # #         #             print("i= ",i, "j= ",j)
-    #         num = 0
-    #         row = i - math.floor(ker_row / 2)
-    #         col = j - math.floor(ker_col / 2)
-    #
-    #         if (row >= math.floor(ker_row / 2) and row < img_row - ker_row and col >= math.floor(ker_col / 2) and col < img_col - ker_col):
-    #             # print("one of the above is true: this row is in [2,763]", row, "and this col is in [2,1147]", col)
-    #             for k in range(ker_row):
-    #                 for l in range(ker_col):
-    #                     #                         print("i= ",i, "j= ",j, "k= ",k, "l ",l ,"gvhgvhjbj")
-    #                     num = num + (kernel[k][l]) * (in_image[row + k][col + l])
-    #             new_img_blurred[i][j] = num
-    #             new_img_check[i][j] = 1
-    #         else:
-    #             # print("one of the above is true: this row is not in [2,763]", row, "and this col is not in [2,1147]",col)
-    #             for k in range(ker_row):
-    #                 for l in range(ker_col):
-    #                     #                         print("i= ",i, "j= ",j, "k= ",k, "l ",l)
-    #                     if (row + k >= 0 and row + k < img_row and col + j >= 0 and col + j < img_col):
-    #                         num = num + (kernel[k][l]) * (in_image[row + k][col + l])
-    #                     else:
-    #                         r = row + k
-    #                         c = col + l
-    #                         if row + k < 0:
-    #                             r = 0;
-    #                         elif row + k >= img_row:
-    #                             r = img_row - 1
-    #                         if col + l < 0:
-    #                             c = 0
-    #                         elif col + l >= img_col:
-    #                             c = img_col - 1
-    #                         num = num + (kernel[k][l]) * (in_image[r][c])
-    #             new_img_blurred[i][j] = num
-    #             new_img_check[i][j] = 1
-    # # print("new_img_blurred")
-    # # plt.imshow(new_img_blurred, cmap='gray')
-    # # plt.show()
-    # return new_img_blurred
-
 
     shape_ker = kernel.shape
     ker_row = shape_ker[0]
     ker_col = shape_ker[1]
 
     shape_img = in_image.shape
-    # print(shape_img)
     img_row = shape_img[0]
     img_col = shape_img[1]
 
     new_img_blurred = np.zeros(shape_img)
-    # print(kernel)
     kernel = np.flip(kernel)
-    # print(kernel)
     r_skip = math.floor(ker_row / 2)
     c_skip = math.floor(ker_col / 2)
 
@@ -222,8 +174,45 @@ def edgeDetectionZeroCrossingLOG(img: np.ndarray) -> np.ndarray:
     :param img: Input image
     :return: opencv solution, my implementation
     """
+    smooth=np.array([[1,2,1],[2,4,2],[1,2,1]])
+    img_smothed=conv2D(img,smooth)
+    lap_filter=np.array([[0,1,0],[1,-4,1],[0,1,0]])
+    filterd=conv2D(img_smothed,lap_filter)
+    plt.imshow(filterd)
+    plt.show()
+    shape=filterd.shape
+    row=shape[0]
+    col=shape[0]
+    new_img=np.zeros(shape)
+    #we will not include the edges so that we can find the other edges easier
+    for i in range (1,row-1):
+        for j in range(1,col-1):
+            center =filterd[i][j]
+            up= filterd[i-1][j]
+            down =filterd[i+1][j]
+            left= filterd[i][j-1]
+            right=filterd[i][j+1]
+            if(center==0):
+                if(right*left<0):
+                    new_img[i][j]=1
+                if(up*down<0):
+                    new_img[i][j] = 1
+            elif (center*up<0):
+                new_img[i][j] = 1
+                new_img[i-1][j] = 1
+            elif (center * down < 0):
+                new_img[i][j] = 1
+                new_img[i+1][j] = 1
+            elif (center*left<0):
+                new_img[i][j] = 1
+                new_img[i][j-1] = 1
+            elif (center*right<0):
+                new_img[i][j] = 1
+                new_img[i][j+1] = 1
+    plt.imshow(new_img)
+    plt.show()
 
-    return
+    return new_img
 
 
 def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
