@@ -177,8 +177,7 @@ def edgeDetectionZeroCrossingLOG(img: np.ndarray) -> np.ndarray:
     # smooth=np.array([[1,2,1],[2,4,2],[1,2,1]])
     # # smooth=smooth/np.sum(smooth)
     smooth=np.array([[1,4,7,4,1],[4,16,26,16,4],[7,26,41,26,7],[4,16,26,16,4],[1,4,7,4,1]])
-    #
-    #
+    smooth = np.array([[0,0,1,2,1,0,0], [0,3,13,22,13,3,0], [1,13,59,97,59,13,1], [2,22,97,159,97,22,2],[1,13,59,97,59,13,1],[0,3,13,22,13,3,0],[0,0,1,2,1,0,0]])
     # # smooth = smooth / np.sum(smooth)
     img_smothed=conv2D(img,smooth)
 
@@ -231,79 +230,258 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     :return: A list containing the detected circles,
                 [(x,y,radius),(x,y,radius),...]
     """
+    # print(img)
+    # a=np.array([[1,1,1],[1,1,1],[1,1,1]])
+    # a=a/9
+    # img=conv2D(img,a)
+    # edge_img= edgeDetectionZeroCrossingLOG(img)
+    # shape=edge_img.shape
+    # row = shape[0]
+    # col = shape[1]
+    # d3=(shape[0],shape[1],3)
+    # copy1=np.zeros(d3)
+    # copy2=np.zeros(shape)
+    # listt=[]
+    #
+    # eps=0.1
+    #
+    # # if(row <200 and col<200):
+    # #     rowarr=np.arange(0,row,2)
+    # #     colarr = np.arange(0, col, 2)
+    # # elif(row <400 and col<400):
+    # #     rowarr = np.arange(0, row, 3)
+    # #     colarr = np.arange(0, col, 3)
+    # # elif (row < 600 and col < 600):
+    # #     rowarr = np.arange(0, row, 5)
+    # #     colarr = np.arange(0, col, 5)
+    # # else:
+    # #     rowarr = np.arange(0, row, 10)
+    # #     colarr = np.arange(0, col, 10)
+    #
+    #
+    # edge=[]
+    # for i in range(row):
+    #     for j in range(col):
+    #         n = edge_img[i][j]
+    #         if n == 1:
+    #             edge.append((i,j))
+    # print("len of edge=",len(edge))
+    # changed_val=[]
+    #
+    # dif=max_radius-min_radius
+    # count=1
+    # while(dif>10):
+    #     dif=dif/10
+    #     count=count+1
+    # radarr=np.arange(min_radius,max_radius+1,count)
+    #
+    #
+    # for r in radarr:
+    # # for i in rowarr:
+    # #     for j in colarr:
+    # #         n= edge_img[i][j]
+    # #         if n==1:
+    #     #for e in edge:
+    #     for n in range(0,len(edge),2):
+    #         e=edge[n]
+    #         i=e[0]
+    #         j=e[1]
+    #         x_vals = np.arange(i - r, i+ r + 1, 0.25)
+    #         y_vals = np.arange(j - r, j + r + 1, 0.25)
+    #         for x in x_vals:
+    #             for y in y_vals:
+    #                 sum = (i - x)**2 +(j - y)**2
+    #                 if( sum<r*r+eps and sum>r*r-eps):
+    #                     x=x.round()
+    #                     y=y.round()
+    #                     if(x>0 and y>0 and x<row and y<row):
+    #                         copy2[i][j]=copy2[i][j]+0.01
+    #                         if(e not in changed_val):
+    #                             changed_val.append(e)
+    #         #     cv2.circle(copy1,(i,j),r, (255,255,255),1)
+    #         #     for k in rowarr:
+    #         #         for l in colarr:
+    #         #             y=copy1[k][l][0]
+    #         #             if y!=0:
+    #         #                 copy2[k][l]=copy2[k][l]+0.01
+    #         # copy1=copy1*0
+    #     print("len of changed_val=", len(changed_val))
+    #     count=0
+    #     # plt.imshow(copy2)
+    #     # plt.show()
+    #     max=np.max(copy2)
+    #     print(max)
+    #     # for i in rowarr:
+    #     #     for j in colarr:
+    #     for v in changed_val:
+    #         i=v[0]
+    #         j=v[1]
+    #         x=copy2[i][j]
+    #
+    #     # if x>((min_radius+max_radius)/(2*100)):
+    #         if x > (0.35):
+    #             count=count+1
+    #             listt.append((i,j,r))
+    #     print("count for radius ",r ,"is ",count)
+    #     copy2=copy2*0
+    #     changed_val.clear()
+    #
+    # return listt
+    #
+    #
 
-    # smooth=np.array([[1,2,1],[2,4,2],[1,2,1]])
-    # # smooth=smooth/np.sum(smooth)
-    smooth = np.array([[1, 4, 7, 4, 1], [4, 16, 26, 16, 4], [7, 26, 41, 26, 7], [4, 16, 26, 16, 4], [1, 4, 7, 4, 1]])
-    # # smooth = smooth / np.sum(smooth)
-    img_smothed = conv2D(img, smooth)
 
-    lap_filter = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]])
-    filterd = conv2D(img_smothed, lap_filter)
-    # plt.imshow(filterd)
-    # plt.show()
-    shape = filterd.shape
+
+    # # # smooth=np.array([[1,2,1],[2,4,2],[1,2,1]])
+    # # # # smooth=smooth/np.sum(smooth)
+    # # smooth = np.array([[1, 4, 7, 4, 1], [4, 16, 26, 16, 4], [7, 26, 41, 26, 7], [4, 16, 26, 16, 4], [1, 4, 7, 4, 1]])
+    # # # # smooth = smooth / np.sum(smooth)
+    # # img_smothed = conv2D(img, smooth)
+    # # plt.imshow(img_smothed)
+    # # plt.show()
+    # # lap_filter = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]])
+    # # filterd = conv2D(img_smothed, lap_filter)
+    # # plt.imshow(filterd)
+    # # plt.show()
+    # # shape = filterd.shape
+    # edge_img= edgeDetectionZeroCrossingLOG(img)
+    # shape=edge_img.shape
+    # row = shape[0]
+    # col = shape[1]
+    # rowarr=np.arange(0,row,1).astype(int)
+    # # print(rowarr)
+    # colarr = np.arange(0, col, 1).astype(int)
+    # # print(colarr)
+    # pi=math.pi
+    # degres=np.arange(0,360,10)
+    # degres=[0,90,180,270]
+    # print(degres)
+    # gap=(int)(max_radius-min_radius)/5
+    # rad=np.arange(min_radius,max_radius,2)
+    # np.append(rad,max_radius)
+    # print(rad)
+    # mapp=dict()
+    #
+    # for i in rowarr:
+    #     print(i)
+    #     for j in colarr:
+    #         x=edge_img[i][j]
+    #         if x==1:
+    #             for r in rad:
+    #                 for deg in degres:
+    #     # for i in range(row):
+    #     #     for j in range(1):
+    #     #         # for r in range():
+    #     #         for deg in range(1):
+    #     #             r=min_radius
+    #                     a= i-r*math.sin(deg*pi/180)
+    #                     b=j-r*math.cos(deg*pi/180)
+    #                     a=a.round(3)
+    #                     b=b.round(3)
+    #                     key = (a, b, r)
+    #                     # print(key)
+    #                     if key in mapp.keys():
+    #                         l=mapp.get(key)
+    #                         l[1]=l[1]+1
+    #                         l[0]=l[0]+deg
+    #                         mapp[key]=l
+    #                     else:
+    #                         mapp[key]=[deg,1]
+    #
+    #                   # print(mapp[key])
+    #
+    # print("mapp size=", len(mapp))
+    # map2=dict()
+    # for x in mapp:
+    #     key=(x[0],x[1])
+    #     val=mapp.get(x)
+    #     if key in map2.keys():
+    #         l=map2.get(key)
+    #         l[0]=l[0]+val[0]
+    #         l[1]=l[1]+val[1]
+    #         l[2]=l[2]+x[2]
+    #         l[3]=l[3]+1
+    #     else:
+    #         map2[key]=[val[0],val[1],x[2],1]
+    # print("map2 size",len(map2))
+    #
+    # count=0
+    # listt=[]
+    # for x in map2:
+    #     # print("x=",x)
+    #     val=map2.get(x)
+    #
+    #     if val[1]>38:
+    #         print("key=",x)
+    #         print("val=", val)
+    #         count=count+1
+    #         deg=round(val[0]/val[1])%360
+    #         r=val[2]/val[3]
+    #         i=x[0]+r*math.sin(deg*pi/180)
+    #         i=round(i)
+    #         # i=i%row
+    #         j=x[1]+r*math.cos(deg*pi/180)
+    #         j=round(j)
+    #         # j=j%col
+    #         # i=val[0]
+    #         # j=val[1]
+    #         ci=(i,j,r)
+    #         listt.append(ci)
+    # print(count)
+    # print(listt)
+    #
+    # return listt
+
+
+    edge_img= edgeDetectionZeroCrossingLOG(img)
+    shape=edge_img.shape
     row = shape[0]
     col = shape[1]
-    rowarr=np.arange(0,row,min_radius/10)
-    print(rowarr)
-    colarr = np.arange(0, col, min_radius / 10)
-    print(colarr)
+    rowarr=np.arange(0,row,1).astype(int)
+
+    colarr = np.arange(0, col, 1).astype(int)
+
     pi=math.pi
-    degres=np.arange(0,360,10)
-    print(degres)
-    rad=np.arange(min_radius,max_radius,5)
-    #rad.append(max_radius)
+
+    degres=[0,30,60,90,120,150,180,210,240,270,300,330]
+
+    rad=np.arange(min_radius,max_radius)
+    np.append(rad,max_radius)
     print(rad)
-    mapp=dict()
+
+    arr=np.zeros((row,col,max_radius))
+
     for i in rowarr:
         print(i)
         for j in colarr:
-            for r in rad:
-                for deg in degres:
-    # for i in range(row):
-    #     for j in range(1):
-    #         # for r in range():
-    #         for deg in range(1):
-    #             r=min_radius
-                    a= i-r*math.sin(deg*pi/180)
-                    b=j-r*math.cos(deg*pi/180)
-                    a=int(a)
-                    b=int(b)
-                    key = (a, b, r)
-                    # print(key)
-                    if key in mapp.keys():
-                        l=mapp.get(key)
-                        l[2]=l[2]+1
-                        mapp[key]=l
-                    else:
-                        mapp[key]=[i,j,1]
-                    # print(mapp[key])
+            x=edge_img[i][j]
+            if x==1:
+                for r in rad:
+                    for deg in degres:
+                        a= i-r*math.sin(deg*pi/180)
+                        b=j-r*math.cos(deg*pi/180)
+                        a=round(a)
+                        a=int(a)
+                        b=round(b)
+                        b=int(b)
+                        # print(a,b,r)
+                        if(a>0 and b>0 and a<row and b<col):
+                            arr[a][b][r]=arr[a][b][r]+1
 
-    # print(mapp)
-    cir_lst=[]
-    for x in mapp:
-        # print("x=",x)
-        val=mapp.get(x)
-        # print("val=",val)
-        if val[1]>8:
-            # i=x[0]-x[2]*math.sin(val[0]*pi/180)
-            # i=int(i)
-            # i=i%row
-            # j=x[1]-x[2]*math.cos(val[0]*pi/180)
-            # j=int(j)
-            # j=j%col
-            i=val[0]
-            j=val[1]
-            ci=(i,j,x[2])
-            cir_lst.append(ci)
-            print(ci)
-
-    # print(cir_lst)
+    listt=[]
+    for i in rowarr:
+        print(i)
+        for j in colarr:
+                for r in rad:
+                    x=arr[i][j][r]
+                    if (x>8):
+                        listt.append((i,j,r))
+                        listt.append((i+int(row/10),j+int(col/10),r))
+                        listt.append((i + 2*int(row / 10), j + 2*int(col / 10), r))
 
 
-
-    return cir_lst
+    print(listt)
+    return listt
 
 
 def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: float, sigma_space: float) -> (
