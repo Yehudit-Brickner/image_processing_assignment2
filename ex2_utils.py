@@ -183,8 +183,8 @@ def edgeDetectionZeroCrossingLOG(img: np.ndarray) -> np.ndarray:
 
     lap_filter=np.array([[0,1,0],[1,-4,1],[0,1,0]])
     filterd=conv2D(img_smothed,lap_filter)
-    plt.imshow(filterd)
-    plt.show()
+    # plt.imshow(filterd)
+    # plt.show()
     shape=filterd.shape
     row=shape[0]
     col=shape[1]
@@ -214,8 +214,8 @@ def edgeDetectionZeroCrossingLOG(img: np.ndarray) -> np.ndarray:
             elif (center*right<0):
                 new_img[i][j] = 1
                 new_img[i][j+1] = 1
-    plt.imshow(new_img)
-    plt.show()
+    # plt.imshow(new_img)
+    # plt.show()
 
     return new_img
 
@@ -431,54 +431,99 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     # print(listt)
     #
     # return listt
+    # o, mag =convDerivative(img)
 
-
-    edge_img= edgeDetectionZeroCrossingLOG(img)
-    shape=edge_img.shape
+    edge_img = edgeDetectionZeroCrossingLOG(img)
+    shape = edge_img.shape
     row = shape[0]
     col = shape[1]
-    rowarr=np.arange(0,row,1).astype(int)
+    rowarr = np.arange(0, row, 2).astype(int)
 
-    colarr = np.arange(0, col, 1).astype(int)
+    colarr = np.arange(0, col, 2).astype(int)
 
-    pi=math.pi
+    pi = math.pi
 
-    degres=[0,30,60,90,120,150,180,210,240,270,300,330]
+    degres=[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]
 
-    rad=np.arange(min_radius,max_radius)
-    np.append(rad,max_radius)
-    print(rad)
+    rad = np.arange(min_radius, max_radius,5)
+    np.append(rad, max_radius)
+    # print(rad)
 
-    arr=np.zeros((row,col,max_radius))
+    arr = np.zeros((row, col, max_radius))
+    mapp=dict()
 
     for i in rowarr:
-        print(i)
+        # print(i)
         for j in colarr:
-            x=edge_img[i][j]
-            if x==1:
+            x = edge_img[i][j]
+            if x == 1:
+                # deg = mag[i][j]
                 for r in rad:
                     for deg in degres:
-                        a= i-r*math.sin(deg*pi/180)
-                        b=j-r*math.cos(deg*pi/180)
-                        a=round(a)
-                        a=int(a)
-                        b=round(b)
-                        b=int(b)
+
+                        # print(deg)
+                        a = i-r*math.sin(deg*pi/180)
+                        b = j-r*math.cos(deg*pi/180)
+
+                        # a = round(a,5)
+                        a = int(a)
+                        # b = round(b,3)
+                        b = int(b)
+                        key=(a,b,r)
+                        # if key in mapp.keys():
+                        #     l=mapp.get(key)
+                        #     mapp[key]=l+1
+                        # else:
+                        #     mapp[key]=1
                         # print(a,b,r)
-                        if(a>0 and b>0 and a<row and b<col):
-                            arr[a][b][r]=arr[a][b][r]+1
+                        for k in range(a-1,a+2):
+                            for l in range(b-1,b+2):
+                                if(k > 0 and l > 0 and k < row and l < col):
+                                    arr[k][l][r] = arr[k][l][r]+1
+                    # a = i + r * math.sin(deg)
+                    # b = j + r * math.cos(deg)
+                    # a = round(a)
+                    # a = int(a)
+                    # b = round(b)
+                    # b = int(b)
+                    # # print(a,b,r)
+                    # if (a > 0 and b > 0 and a < row and b < col):
+                    #     arr[a][b][r] = arr[a][b][r] + 1
 
-    listt=[]
-    for i in rowarr:
-        print(i)
-        for j in colarr:
-                for r in rad:
-                    x=arr[i][j][r]
-                    if (x>8):
-                        listt.append((i,j,r))
-                        listt.append((i+int(row/10),j+int(col/10),r))
-                        listt.append((i + 2*int(row / 10), j + 2*int(col / 10), r))
+    maxes=[]
+    for r in rad:
+        a=arr[:,:,r]
+        maxnum = np.max(a)
+        print( "max for rad ", r ," is ",maxnum)
+        if maxnum not in maxes:
+            maxes.append(maxnum)
+        # plt.imshow(arr[:,:,r])
+        # plt.show()
+    # for x in mapp:
+    #     y = mapp.get(x)
+    #     if y not in maxes:
+    #         maxes.append(y)
 
+    maxes.sort()
+    print(maxes)
+    cutoff = maxes[-1]
+
+
+    listt = []
+    for i in range(row):
+        # print(i)
+        for j in range(col):
+            for r in rad:
+                x=arr[i][j][r]
+                # print(x)
+                if (x>=cutoff):
+                    listt.append((i,j,r))
+    #                 # listt.append((i+int(row/10),j+int(col/10),r))
+    #                 # listt.append((i + 2*int(row / 10), j - 1.5*int(col / 10), r))
+    # for x in mapp:
+    #     y = mapp.get(x)
+    #     if y>=cutoff:
+    #         listt.append(x)
 
     print(listt)
     return listt
