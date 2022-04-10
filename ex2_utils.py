@@ -591,38 +591,24 @@ def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: f
     col = shape[1]
     rowarr = np.arange(0, row, 1).astype(int)
     colarr = np.arange(0, col, 1).astype(int)
-    pad =math.floor(k_size/2)
+    pad= math.floor(k_size/2)
     padded_image = cv2.copyMakeBorder(in_image, pad, pad, pad, pad, cv2.BORDER_REPLICATE, None, value=0)
     image_new = np.zeros(shape)
     # print(shape)
-    try:
-        for x in rowarr:
-            print(x)
-            for y in colarr:
-                pivot_v = in_image[x, y]
-                neighbor_hood = padded_image[
-                                x :x + k_size,
-                                y :y +k_size
-                                ]
-                diff = pivot_v - neighbor_hood
-                diff_gau = np.exp(-np.power(diff, 2) / (2 * sigma_color))
-                gaus = cv2.getGaussianKernel(k_size , k_size)
-                gaus = gaus.dot(gaus.T)
-                combo = gaus * diff_gau
-                result = combo * neighbor_hood/ combo.sum()
-                # print(result)
-                ans=result.sum()
-                # for i in range(result.shape[0]):
-                #     for j in range(result.shape[1]):
-                #         ans+=result[i][j]*neighbor_hood[i][j]
-                image_new[x][y]=ans
 
-                # print(x, y)
-    except:
-        print("there was a problem")
-    # print(image_new)
-    # image_new=NormalizeData(image_new)
-    # # print(image_new)
-    # image_new=image_new*255
-    # image_new=image_new.astype(int)
+    for x in rowarr:
+        print(x)
+        for y in colarr:
+            pivot_v = in_image[x, y]
+            neighbor_hood = padded_image[x :x + k_size ,
+                                        y :y + k_size]
+            diff = pivot_v - neighbor_hood
+            diff_gau = np.exp(-np.power(diff, 2) / (2 * sigma_color))
+            gaus = cv2.getGaussianKernel(k_size , k_size)
+            gaus = gaus.dot(gaus.T)
+            combo = gaus * diff_gau
+            result = combo * neighbor_hood/ combo.sum()
+            ans=result.sum()
+            image_new[x][y]=ans
+  
     return cv_image,image_new
