@@ -434,22 +434,41 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     #
     # return listt
     # o, mag =convDerivative(img)
+    ker=np.array([[1,1,1],[1,1,1],[1,1,1]])/9
 
+    img=conv2D(img,ker)
     edge_img = edgeDetectionZeroCrossingLOG(img)
     shape = edge_img.shape
     row = shape[0]
     col = shape[1]
-    rowarr = np.arange(0, row, 4).astype(int)
 
-    colarr = np.arange(0, col, 4).astype(int)
-
+    if(row<150 and col<150):
+        rowarr = np.arange(0, row,1).astype(int)
+        colarr = np.arange(0, col,1).astype(int)
+    elif(row<300 and col<300):
+        rowarr = np.arange(0, row,3 ).astype(int)
+        colarr = np.arange(0, col, 3).astype(int)
+    elif (row < 500 and col < 500):
+        rowarr = np.arange(0, row, 5).astype(int)
+        colarr = np.arange(0, col, 5).astype(int)
+    else :
+        rowarr = np.arange(0, row, 10).astype(int)
+        colarr = np.arange(0, col, 10).astype(int)
     pi = math.pi
 
     degres=[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]
-
-    rad = np.arange(min_radius, max_radius,5)
-    np.append(rad, max_radius)
-    # print(rad)
+    if(max_radius-min_radius<=10):
+        rad = np.arange(min_radius, max_radius,1)
+        np.append(rad, max_radius)
+    elif (max_radius - min_radius <= 20):
+        rad = np.arange(min_radius, max_radius, 2)
+        np.append(rad, max_radius)
+    elif (max_radius - min_radius <= 50):
+        rad = np.arange(min_radius, max_radius, 5)
+        np.append(rad, max_radius)
+    else :
+        rad = np.arange(min_radius, max_radius, 10)
+        np.append(rad, max_radius)
 
     arr = np.zeros((row, col, max_radius))
     mapp=dict()
@@ -508,7 +527,7 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
 
     maxes.sort()
     print(maxes)
-    cutoff = maxes[-2]
+    cutoff = maxes[-1]
 
 
     listt = []
@@ -519,7 +538,7 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                 x=arr[i][j][r]
                 # print(x)
                 if (x>=cutoff):
-                    listt.append((i,j,r))
+                    listt.append((j,i,r))
     #                 # listt.append((i+int(row/10),j+int(col/10),r))
     #                 # listt.append((i + 2*int(row / 10), j - 1.5*int(col / 10), r))
     # for x in mapp:
@@ -541,49 +560,6 @@ def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: f
     :return: OpenCV implementation, my implementation
     """
 
-
-
-    # f, ax = plt.subplots(1, 3)
-    # ax[0].set_title('Original')
-    # ax[1].set_title('cv2')
-    # ax[2].set_title('dif')
-    # ax[0].imshow(in_image)
-    # ax[1].imshow(cv_image)
-    # ax[2].imshow(in_image-cv_image)
-    # plt.show()
-    # pad=math.floor(k_size/2)
-
-    # padded_image = cv2.copyMakeBorder(in_image, k_size, k_size, k_size, k_size, cv2.BORDER_REPLICATE, None, value=0)
-    # gaus = cv2.getGaussianKernel(k_size, sigma_color)
-    # gaus = gaus.dot(gaus.T)
-
-    # shape = in_image.shape
-    # x = shape[0]
-    # y = shape[1]
-    # image_new = np.zeros(shape)
-    # for i in range(x):
-    #     for j in range(y):
-    #         neighborhood = padded_image[i: i + k_size + 1, j : j + k_size + 1]
-    #         piv = in_image[i][j]
-    #         up=0
-    #         down=0
-    #         for k in range (k_size):
-    #             for l in range(k_size):
-    #                 up+=math.exp(-()/(2*sigma_color**2))+math.exp(math.abs(piv-neighborhood[k][l])/2*sigma_space**2)
-    #                 # down+=
-
-    # pivot_v = in_image[ x-1,y-1]
-    # neighbor_hood = in_image[
-    #                 x - k_size:x + k_size + 1,
-    #                 y - k_size:y + k_size + 1
-    #                 ]
-    # sigma = .01
-    # diff = pivot_v - neighbor_hood
-    # diff_gau = np.exp(-np.power(diff, 2) / (2 * sigma))
-    # gaus = cv2.getGaussianKernel(2 * k_size + 1, k_size)
-    # gaus = gaus.dot(gaus.T)
-    # combo = gaus * diff_gau
-    # result = combo * neighbor_hood / combo.sum()
     cv_image = cv2.bilateralFilter(in_image, k_size, sigma_color, sigma_space)
 
     shape = in_image.shape
@@ -610,5 +586,5 @@ def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: f
             result = combo * neighbor_hood/ combo.sum()
             ans=result.sum()
             image_new[x][y]=ans
-  
+
     return cv_image,image_new
