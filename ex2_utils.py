@@ -232,319 +232,194 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     :return: A list containing the detected circles,
                 [(x,y,radius),(x,y,radius),...]
     """
-    # print(img)
-    # a=np.array([[1,1,1],[1,1,1],[1,1,1]])
-    # a=a/9
-    # img=conv2D(img,a)
-    # edge_img= edgeDetectionZeroCrossingLOG(img)
-    # shape=edge_img.shape
-    # row = shape[0]
-    # col = shape[1]
-    # d3=(shape[0],shape[1],3)
-    # copy1=np.zeros(d3)
-    # copy2=np.zeros(shape)
-    # listt=[]
-    #
-    # eps=0.1
-    #
-    # # if(row <200 and col<200):
-    # #     rowarr=np.arange(0,row,2)
-    # #     colarr = np.arange(0, col, 2)
-    # # elif(row <400 and col<400):
-    # #     rowarr = np.arange(0, row, 3)
-    # #     colarr = np.arange(0, col, 3)
-    # # elif (row < 600 and col < 600):
-    # #     rowarr = np.arange(0, row, 5)
-    # #     colarr = np.arange(0, col, 5)
-    # # else:
-    # #     rowarr = np.arange(0, row, 10)
-    # #     colarr = np.arange(0, col, 10)
-    #
-    #
-    # edge=[]
-    # for i in range(row):
-    #     for j in range(col):
-    #         n = edge_img[i][j]
-    #         if n == 1:
-    #             edge.append((i,j))
-    # print("len of edge=",len(edge))
-    # changed_val=[]
-    #
-    # dif=max_radius-min_radius
-    # count=1
-    # while(dif>10):
-    #     dif=dif/10
-    #     count=count+1
-    # radarr=np.arange(min_radius,max_radius+1,count)
-    #
-    #
-    # for r in radarr:
-    # # for i in rowarr:
-    # #     for j in colarr:
-    # #         n= edge_img[i][j]
-    # #         if n==1:
-    #     #for e in edge:
-    #     for n in range(0,len(edge),2):
-    #         e=edge[n]
-    #         i=e[0]
-    #         j=e[1]
-    #         x_vals = np.arange(i - r, i+ r + 1, 0.25)
-    #         y_vals = np.arange(j - r, j + r + 1, 0.25)
-    #         for x in x_vals:
-    #             for y in y_vals:
-    #                 sum = (i - x)**2 +(j - y)**2
-    #                 if( sum<r*r+eps and sum>r*r-eps):
-    #                     x=x.round()
-    #                     y=y.round()
-    #                     if(x>0 and y>0 and x<row and y<row):
-    #                         copy2[i][j]=copy2[i][j]+0.01
-    #                         if(e not in changed_val):
-    #                             changed_val.append(e)
-    #         #     cv2.circle(copy1,(i,j),r, (255,255,255),1)
-    #         #     for k in rowarr:
-    #         #         for l in colarr:
-    #         #             y=copy1[k][l][0]
-    #         #             if y!=0:
-    #         #                 copy2[k][l]=copy2[k][l]+0.01
-    #         # copy1=copy1*0
-    #     print("len of changed_val=", len(changed_val))
-    #     count=0
-    #     # plt.imshow(copy2)
-    #     # plt.show()
-    #     max=np.max(copy2)
-    #     print(max)
-    #     # for i in rowarr:
-    #     #     for j in colarr:
-    #     for v in changed_val:
-    #         i=v[0]
-    #         j=v[1]
-    #         x=copy2[i][j]
-    #
-    #     # if x>((min_radius+max_radius)/(2*100)):
-    #         if x > (0.35):
-    #             count=count+1
-    #             listt.append((i,j,r))
-    #     print("count for radius ",r ,"is ",count)
-    #     copy2=copy2*0
-    #     changed_val.clear()
-    #
-    # return listt
-    #
-    #
 
-
-
-    # # # smooth=np.array([[1,2,1],[2,4,2],[1,2,1]])
-    # # # # smooth=smooth/np.sum(smooth)
-    # # smooth = np.array([[1, 4, 7, 4, 1], [4, 16, 26, 16, 4], [7, 26, 41, 26, 7], [4, 16, 26, 16, 4], [1, 4, 7, 4, 1]])
-    # # # # smooth = smooth / np.sum(smooth)
-    # # img_smothed = conv2D(img, smooth)
-    # # plt.imshow(img_smothed)
-    # # plt.show()
-    # # lap_filter = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]])
-    # # filterd = conv2D(img_smothed, lap_filter)
-    # # plt.imshow(filterd)
-    # # plt.show()
-    # # shape = filterd.shape
-    # edge_img= edgeDetectionZeroCrossingLOG(img)
-    # shape=edge_img.shape
-    # row = shape[0]
-    # col = shape[1]
-    # rowarr=np.arange(0,row,1).astype(int)
-    # # print(rowarr)
-    # colarr = np.arange(0, col, 1).astype(int)
-    # # print(colarr)
-    # pi=math.pi
-    # degres=np.arange(0,360,10)
-    # degres=[0,90,180,270]
-    # print(degres)
-    # gap=(int)(max_radius-min_radius)/5
-    # rad=np.arange(min_radius,max_radius,2)
-    # np.append(rad,max_radius)
-    # print(rad)
-    # mapp=dict()
-    #
-    # for i in rowarr:
-    #     print(i)
-    #     for j in colarr:
-    #         x=edge_img[i][j]
-    #         if x==1:
-    #             for r in rad:
-    #                 for deg in degres:
-    #     # for i in range(row):
-    #     #     for j in range(1):
-    #     #         # for r in range():
-    #     #         for deg in range(1):
-    #     #             r=min_radius
-    #                     a= i-r*math.sin(deg*pi/180)
-    #                     b=j-r*math.cos(deg*pi/180)
-    #                     a=a.round(3)
-    #                     b=b.round(3)
-    #                     key = (a, b, r)
-    #                     # print(key)
-    #                     if key in mapp.keys():
-    #                         l=mapp.get(key)
-    #                         l[1]=l[1]+1
-    #                         l[0]=l[0]+deg
-    #                         mapp[key]=l
-    #                     else:
-    #                         mapp[key]=[deg,1]
-    #
-    #                   # print(mapp[key])
-    #
-    # print("mapp size=", len(mapp))
-    # map2=dict()
-    # for x in mapp:
-    #     key=(x[0],x[1])
-    #     val=mapp.get(x)
-    #     if key in map2.keys():
-    #         l=map2.get(key)
-    #         l[0]=l[0]+val[0]
-    #         l[1]=l[1]+val[1]
-    #         l[2]=l[2]+x[2]
-    #         l[3]=l[3]+1
-    #     else:
-    #         map2[key]=[val[0],val[1],x[2],1]
-    # print("map2 size",len(map2))
-    #
-    # count=0
-    # listt=[]
-    # for x in map2:
-    #     # print("x=",x)
-    #     val=map2.get(x)
-    #
-    #     if val[1]>38:
-    #         print("key=",x)
-    #         print("val=", val)
-    #         count=count+1
-    #         deg=round(val[0]/val[1])%360
-    #         r=val[2]/val[3]
-    #         i=x[0]+r*math.sin(deg*pi/180)
-    #         i=round(i)
-    #         # i=i%row
-    #         j=x[1]+r*math.cos(deg*pi/180)
-    #         j=round(j)
-    #         # j=j%col
-    #         # i=val[0]
-    #         # j=val[1]
-    #         ci=(i,j,r)
-    #         listt.append(ci)
-    # print(count)
-    # print(listt)
-    #
-    # return listt
-    # o, mag =convDerivative(img)
     ker=np.array([[1,1,1],[1,1,1],[1,1,1]])/9
-
+    # plt.imshow(img)
+    # plt.show()
     img=conv2D(img,ker)
+    # plt.imshow(img)
+    # plt.show()
     edge_img = edgeDetectionZeroCrossingLOG(img)
+    # plt.imshow(edge_img)
+    # plt.show()
     shape = edge_img.shape
     row = shape[0]
     col = shape[1]
-
-    if(row<150 and col<150):
-        rowarr = np.arange(0, row,1).astype(int)
-        colarr = np.arange(0, col,1).astype(int)
-    elif(row<300 and col<300):
-        rowarr = np.arange(0, row,3 ).astype(int)
-        colarr = np.arange(0, col, 3).astype(int)
-    elif (row < 500 and col < 500):
-        rowarr = np.arange(0, row, 5).astype(int)
-        colarr = np.arange(0, col, 5).astype(int)
-    else :
+    pi = math.pi
+    # if(row<150 and col<150):
+    #     rowarr = np.arange(0, row,1).astype(int)
+    #     colarr = np.arange(0, col,1).astype(int)
+    # elif(row<300 and col<300):
+    #     rowarr = np.arange(0, row,3 ).astype(int)
+    #     colarr = np.arange(0, col, 3).astype(int)
+    # elif (row < 500 and col < 500):
+    #     rowarr = np.arange(0, row, 5).astype(int)
+    #     colarr = np.arange(0, col, 5).astype(int)
+    # else :
+    #     rowarr = np.arange(0, row, 10).astype(int)
+    #     colarr = np.arange(0, col, 10).astype(int)
+    if (row <=400 and col <=400):
+        rowarr = np.arange(0, row, 1).astype(int)
+        colarr = np.arange(0, col, 1).astype(int)
+    elif (row <=600 and col <=600):
+        rowarr = np.arange(0, row, 2).astype(int)
+        colarr = np.arange(0, col, 2).astype(int)
+    elif (row <=800 and col <=800):
+        rowarr = np.arange(0, row, 4).astype(int)
+        colarr = np.arange(0, col, 4).astype(int)
+    else:
         rowarr = np.arange(0, row, 10).astype(int)
         colarr = np.arange(0, col, 10).astype(int)
-    pi = math.pi
 
-    degres=[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]
-    if(max_radius-min_radius<=10):
+    # rowarr = np.arange(0, row, 2).astype(int)
+    # colarr = np.arange(0, col, 2).astype(int)
+    # degres=[0, 30,60, 90, 120, 150, 180, 210, 240, 270, 300, 330]
+    degres=np.arange(0,360,10)
+    # if(max_radius-min_radius<=10):
+    #     rad = np.arange(min_radius, max_radius,1)
+    #     np.append(rad, max_radius)
+    # elif (max_radius - min_radius <= 20):
+    #     rad = np.arange(min_radius, max_radius, 2)
+    #     np.append(rad, max_radius)
+    # elif (max_radius - min_radius <= 50):
+    #     rad = np.arange(min_radius, max_radius, 1)
+    #     np.append(rad, max_radius)
+    # else :
+    #     rad = np.arange(min_radius, max_radius, 10)
+    #     np.append(rad, max_radius)
+    if(max_radius-min_radius<=30):
         rad = np.arange(min_radius, max_radius,1)
         np.append(rad, max_radius)
-    elif (max_radius - min_radius <= 20):
+    elif (max_radius - min_radius <= 50):
         rad = np.arange(min_radius, max_radius, 2)
         np.append(rad, max_radius)
-    elif (max_radius - min_radius <= 50):
-        rad = np.arange(min_radius, max_radius, 5)
-        np.append(rad, max_radius)
     else :
-        rad = np.arange(min_radius, max_radius, 10)
+        rad = np.arange(min_radius, max_radius, 3)
         np.append(rad, max_radius)
 
     arr = np.zeros((row, col, max_radius))
-    mapp=dict()
+
 
     for i in rowarr:
         # print(i)
         for j in colarr:
             x = edge_img[i][j]
             if x == 1:
-                # deg = mag[i][j]
                 for r in rad:
                     for deg in degres:
-
-                        # print(deg)
                         a = i-r*math.sin(deg*pi/180)
                         b = j-r*math.cos(deg*pi/180)
-
-                        # a = round(a,5)
                         a = int(a)
-                        # b = round(b,3)
                         b = int(b)
-                        key=(a,b,r)
-                        # if key in mapp.keys():
-                        #     l=mapp.get(key)
-                        #     mapp[key]=l+1
-                        # else:
-                        #     mapp[key]=1
-                        # print(a,b,r)
                         for k in range(a-1,a+2):
                             for l in range(b-1,b+2):
                                 if(k > 0 and l > 0 and k < row and l < col):
                                     arr[k][l][r] = arr[k][l][r]+1
-                    # a = i + r * math.sin(deg)
-                    # b = j + r * math.cos(deg)
-                    # a = round(a)
-                    # a = int(a)
-                    # b = round(b)
-                    # b = int(b)
-                    # # print(a,b,r)
-                    # if (a > 0 and b > 0 and a < row and b < col):
-                    #     arr[a][b][r] = arr[a][b][r] + 1
-
     maxes=[]
     for r in rad:
         a=arr[:,:,r]
         maxnum = np.max(a)
-        print( "max for rad ", r ," is ",maxnum)
+        # print( "max for rad ", r ," is ",maxnum)
+        num=0
+        biggest=0
+        bigr=0
         if maxnum not in maxes:
+            num+=maxnum
+            if(maxnum>biggest):
+                biggest=maxnum
+                bigr=r
             maxes.append(maxnum)
         # plt.imshow(arr[:,:,r])
         # plt.show()
-    # for x in mapp:
-    #     y = mapp.get(x)
-    #     if y not in maxes:
-    #         maxes.append(y)
+        middle=math.ceil(num/len(maxes))
+
 
     maxes.sort()
-    print(maxes)
+
     cutoff = maxes[-1]
 
 
     listt = []
-    for i in range(row):
-        # print(i)
-        for j in range(col):
-            for r in rad:
-                x=arr[i][j][r]
-                # print(x)
-                if (x>=cutoff):
-                    listt.append((j,i,r))
-    #                 # listt.append((i+int(row/10),j+int(col/10),r))
-    #                 # listt.append((i + 2*int(row / 10), j - 1.5*int(col / 10), r))
-    # for x in mapp:
-    #     y = mapp.get(x)
-    #     if y>=cutoff:
-    #         listt.append(x)
+
+    # add th emost correct first than add othars
+    if (maxnum >= cutoff):
+        for i in range(row):
+            for j in range(col):
+                x = arr[i][j][bigr]
+                if (x >= maxnum):
+                     listt.append((j, i, r))
+
+    for r in rad:
+        a = arr[:, :, r]
+        maxnum = np.max(a)
+        if(maxnum>middle):
+            for i in range(row):
+                for j in range(col):
+                    x=arr[i][j][r]
+                    if (x >= maxnum):
+                        # listt.append((j, i, r))
+                        add = True
+                        # print(listt)
+                        for z in range(len(listt)):
+                            if (np.abs(listt[z][0] - j) <= min_radius and np.abs(listt[z][1] - i) <= min_radius and np.abs(listt[z][2] - r)<=min_radius):
+                                add = False
+                                if(np.abs(listt[z][0] - j) <3 and np.abs(listt[z][1] - i) < 3 and np.abs(listt[z][2] - r)<=3):
+                                   newj=(listt[z][0] + j)/2.0
+                                   newi=(listt[z][1] + i)/2.0
+                                   newr=(listt[z][2] + r)/2.0
+                                   # print(len(listt))
+                                   listt[z] = (newj,newi,newr)
+                                   # print(len(listt))
+                        if (add):
+                            listt.append((j, i, r))
+                            # print(x)
+    # for i in range(row):
+    #     for j in range(col):
+    #         for r in rad:
+    #             x=arr[i][j][r]
+    #             if (x>=cutoff):
+    #                 add = True
+    #                 # print(listt)
+    #                 for z in range(len(listt)):
+    #                     if (np.abs(listt[z][0] - j) <= min_radius and np.abs(listt[z][1] - i) <= min_radius):
+    #                         add = False
+    #                         if(np.abs(listt[z][0] - j) <3 and np.abs(listt[z][1] - i) < 3 and np.abs(listt[z][2] - r)<=3 ):
+    #                            newj=(listt[z][0] + j)/2.0
+    #                            newi=(listt[z][1] + i)/2.0
+    #                            newr=(listt[z][2] + r)/2.0
+    #                            print(len(listt))
+    #                            listt[z] = (newj,newi,newr)
+    #                            print(len(listt))
+    #
+    #                 if (add):
+    #                     listt.append((j, i, r))
+    #                     # print(x)
+
+
+    # cutoff=maxes[-2]
+    # for i in range(row):
+    #     for j in range(col):
+    #         for r in rad:
+    #             x=arr[i][j][r]
+    #             if (x>=cutoff):
+    #                 add=True
+    #                 # print(listt)
+    #                 for z in range (len(listt)):
+    #                     print("listt[z]",listt[z])
+    #                     if(np.abs(listt[z][0]-j)<=min_radius and np.abs(listt[z][1]-i)<=min_radius):
+    #                         add= False
+    #                         if (np.abs(listt[z][0] - j) <= 3 and np.abs(listt[z][1] - i) <=3 and np.abs(listt[z][2] - r)<=3):
+    #                             newj = (listt[z][0] + j) / 2.0
+    #                             newi = (listt[z][1] + i) / 2.0
+    #                             newr = (listt[z][2] + r) / 2.0
+    #                             print(len(listt))
+    #                             listt[z] = (newj, newi, newr)
+    #                             print(len(listt))
+    #                 if(add):
+    #                     print("adding", j,i,r)
+    #                     listt.append((j, i, r))
+    #                     # print(x)
+
 
     print(listt)
     return listt
