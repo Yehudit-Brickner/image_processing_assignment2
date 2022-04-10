@@ -13,6 +13,8 @@ def myID() -> np.int:
     return 328601018
 
 
+def NormalizeData(data):
+    return (data - np.min(data)) / (np.max(data) - np.min(data))
 
 
 def conv1D(in_signal: np.ndarray, k_size: np.ndarray) -> np.ndarray:
@@ -437,9 +439,9 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     shape = edge_img.shape
     row = shape[0]
     col = shape[1]
-    rowarr = np.arange(0, row, 2).astype(int)
+    rowarr = np.arange(0, row, 4).astype(int)
 
-    colarr = np.arange(0, col, 2).astype(int)
+    colarr = np.arange(0, col, 4).astype(int)
 
     pi = math.pi
 
@@ -506,7 +508,7 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
 
     maxes.sort()
     print(maxes)
-    cutoff = maxes[-1]
+    cutoff = maxes[-2]
 
 
     listt = []
@@ -539,4 +541,88 @@ def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: f
     :return: OpenCV implementation, my implementation
     """
 
-    return
+
+
+    # f, ax = plt.subplots(1, 3)
+    # ax[0].set_title('Original')
+    # ax[1].set_title('cv2')
+    # ax[2].set_title('dif')
+    # ax[0].imshow(in_image)
+    # ax[1].imshow(cv_image)
+    # ax[2].imshow(in_image-cv_image)
+    # plt.show()
+    # pad=math.floor(k_size/2)
+
+    # padded_image = cv2.copyMakeBorder(in_image, k_size, k_size, k_size, k_size, cv2.BORDER_REPLICATE, None, value=0)
+    # gaus = cv2.getGaussianKernel(k_size, sigma_color)
+    # gaus = gaus.dot(gaus.T)
+
+    # shape = in_image.shape
+    # x = shape[0]
+    # y = shape[1]
+    # image_new = np.zeros(shape)
+    # for i in range(x):
+    #     for j in range(y):
+    #         neighborhood = padded_image[i: i + k_size + 1, j : j + k_size + 1]
+    #         piv = in_image[i][j]
+    #         up=0
+    #         down=0
+    #         for k in range (k_size):
+    #             for l in range(k_size):
+    #                 up+=math.exp(-()/(2*sigma_color**2))+math.exp(math.abs(piv-neighborhood[k][l])/2*sigma_space**2)
+    #                 # down+=
+
+    # pivot_v = in_image[ x-1,y-1]
+    # neighbor_hood = in_image[
+    #                 x - k_size:x + k_size + 1,
+    #                 y - k_size:y + k_size + 1
+    #                 ]
+    # sigma = .01
+    # diff = pivot_v - neighbor_hood
+    # diff_gau = np.exp(-np.power(diff, 2) / (2 * sigma))
+    # gaus = cv2.getGaussianKernel(2 * k_size + 1, k_size)
+    # gaus = gaus.dot(gaus.T)
+    # combo = gaus * diff_gau
+    # result = combo * neighbor_hood / combo.sum()
+    cv_image = cv2.bilateralFilter(in_image, k_size, sigma_color, sigma_space)
+
+    shape = in_image.shape
+    row = shape[0]
+    col = shape[1]
+    rowarr = np.arange(0, row, 1).astype(int)
+    colarr = np.arange(0, col, 1).astype(int)
+    pad =math.floor(k_size/2)
+    padded_image = cv2.copyMakeBorder(in_image, pad, pad, pad, pad, cv2.BORDER_REPLICATE, None, value=0)
+    image_new = np.zeros(shape)
+    # print(shape)
+    try:
+        for x in rowarr:
+            print(x)
+            for y in colarr:
+                pivot_v = in_image[x, y]
+                neighbor_hood = padded_image[
+                                x :x + k_size,
+                                y :y +k_size
+                                ]
+                diff = pivot_v - neighbor_hood
+                diff_gau = np.exp(-np.power(diff, 2) / (2 * sigma_color))
+                gaus = cv2.getGaussianKernel(k_size , k_size)
+                gaus = gaus.dot(gaus.T)
+                combo = gaus * diff_gau
+                result = combo * neighbor_hood/ combo.sum()
+                # print(result)
+                ans=result.sum()
+                # for i in range(result.shape[0]):
+                #     for j in range(result.shape[1]):
+                #         ans+=result[i][j]*neighbor_hood[i][j]
+                image_new[x][y]=ans
+
+                # print(x, y)
+    except:
+        print("there was a problem")
+    # print(image_new)
+    # image_new=NormalizeData(image_new)
+    # # print(image_new)
+    # image_new=image_new*255
+    # image_new=image_new.astype(int)
+    return cv_image,image_new
