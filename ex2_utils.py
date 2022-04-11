@@ -258,12 +258,15 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     # else :
     #     rowarr = np.arange(0, row, 10).astype(int)
     #     colarr = np.arange(0, col, 10).astype(int)
-    if (row <=400 and col <=400):
+    if (row <=300 and col <=300):
         rowarr = np.arange(0, row, 1).astype(int)
         colarr = np.arange(0, col, 1).astype(int)
-    elif (row <=600 and col <=600):
+    elif (row <=450and col <=450):
         rowarr = np.arange(0, row, 2).astype(int)
         colarr = np.arange(0, col, 2).astype(int)
+    elif (row <= 600 and col <=600):
+        rowarr = np.arange(0, row, 3).astype(int)
+        colarr = np.arange(0, col, 3).astype(int)
     elif (row <=800 and col <=800):
         rowarr = np.arange(0, row, 4).astype(int)
         colarr = np.arange(0, col, 4).astype(int)
@@ -332,13 +335,8 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
         # plt.imshow(arr[:,:,r])
         # plt.show()
         middle=math.ceil(num/len(maxes))
-
-
     maxes.sort()
-
     cutoff = maxes[-1]
-
-
     listt = []
 
     # add th emost correct first than add othars
@@ -348,6 +346,7 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                 x = arr[i][j][bigr]
                 if (x >= maxnum):
                      listt.append((j, i, r))
+
 
     for r in rad:
         a = arr[:, :, r]
