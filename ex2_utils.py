@@ -246,22 +246,8 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     row = shape[0]
     col = shape[1]
     pi = math.pi
-    #oldest
-    # if(row<150 and col<150):
-    #     rowarr = np.arange(0, row,1).astype(int)
-    #     colarr = np.arange(0, col,1).astype(int)
-    # elif(row<300 and col<300):
-    #     rowarr = np.arange(0, row,3 ).astype(int)
-    #     colarr = np.arange(0, col, 3).astype(int)
-    # elif (row < 500 and col < 500):
-    #     rowarr = np.arange(0, row, 5).astype(int)
-    #     colarr = np.arange(0, col, 5).astype(int)
-    # else :
-    #     rowarr = np.arange(0, row, 10).astype(int)
-    #     colarr = np.arange(0, col, 10).astype(int)
 
 
-    # fastish and presis
     if (row <=300 and col <=300):
         rowarr = np.arange(0, row, 1).astype(int)
         colarr = np.arange(0, col, 1).astype(int)
@@ -278,50 +264,6 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
         rowarr = np.arange(0, row, 10).astype(int)
         colarr = np.arange(0, col, 10).astype(int)
 
-
-
-
-    #  not as fast and more presis
-    # if (row <=300 ):
-    #     rowarr = np.arange(0, row, 1).astype(int)
-    # elif (row <=450):
-    #     rowarr = np.arange(0, row, 2).astype(int)
-    # elif (row <= 600):
-    #     rowarr = np.arange(0, row, 3).astype(int)
-    # elif (row <=800):
-    #     rowarr = np.arange(0, row, 4).astype(int)
-    # else:
-    #     rowarr = np.arange(0, row, 10).astype(int)
-    # if (col <= 300):
-    #     colarr = np.arange(0, col, 1).astype(int)
-    # elif (col <= 450):
-    #     colarr = np.arange(0, col, 2).astype(int)
-    # elif (col <= 600):
-    #     colarr = np.arange(0, col, 3).astype(int)
-    # elif (col <= 800):
-    #     colarr = np.arange(0, col, 4).astype(int)
-    # else:
-    #     colarr = np.arange(0, col, 10).astype(int)
-
-
-
-
-
-    # old
-    # if(max_radius-min_radius<=10):
-    #     rad = np.arange(min_radius, max_radius,1)
-    #     np.append(rad, max_radius)
-    # elif (max_radius - min_radius <= 20):
-    #     rad = np.arange(min_radius, max_radius, 2)
-    #     np.append(rad, max_radius)
-    # elif (max_radius - min_radius <= 50):
-    #     rad = np.arange(min_radius, max_radius, 1)
-    #     np.append(rad, max_radius)
-    # else :
-    #     rad = np.arange(min_radius, max_radius, 10)
-    #     np.append(rad, max_radius)
-
-    # fastest and presis
     if(max_radius-min_radius<=30):
         rad = np.arange(min_radius, max_radius,1)
         np.append(rad, max_radius)
@@ -332,23 +274,8 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
         rad = np.arange(min_radius, max_radius, 3)
         np.append(rad, max_radius)
 
-    # if (max_radius - min_radius <= 20):
-    #     rad = np.arange(min_radius, max_radius, 1)
-    #     np.append(rad, max_radius)
-    # elif (max_radius - min_radius <= 40):
-    #     rad = np.arange(min_radius, max_radius, 2)
-    #     np.append(rad, max_radius)
-    # elif (max_radius - min_radius <= 60):
-    #     rad = np.arange(min_radius, max_radius, 3)
-    #     np.append(rad, max_radius)
-    # else:
-    #     rad = np.arange(min_radius, max_radius, 5)
-    #     np.append(rad, max_radius)
-
-    degres = np.arange(0, 360, 10)
-
+    degres = np.arange(0, 360, 12)
     arr = np.zeros((row, col, max_radius))
-
 
     for i in rowarr:
         # print(i)
@@ -376,18 +303,23 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
         biggest=0
         if maxnum not in maxes:
             num+=maxnum
-            if(maxnum>biggest):
-                biggest=maxnum
-                bigr=r
             maxes.append(maxnum)
         # plt.imshow(arr[:,:,r])
         # plt.show()
-    print("num=",num)
-    middle=math.ceil(num/len(maxes))
-    print("middle=",middle)
     maxes.sort()
     print(maxes)
     cutoff = maxes[-1]
+    print("num=",num)
+    if(len(maxes)>4):
+        # middle = math.ceil((num - cutoff) / (len(maxes) -1))
+        middle=math.ceil((num-cutoff-maxes[-2])/(len(maxes)-2))
+    else:
+        if(len(maxes)>=2):
+            middle=math.ceil(num-maxes[0]/len(maxes)-1)
+        else:
+            middle=maxes[0]
+    print("middle=",middle)
+
     # print("cutoff=",cutoff)
     # middle=math.floor((middle+cutoff)/2)
     # print("middle=", middle)
@@ -403,7 +335,6 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                     x = arr[i][j][r]
                     if (x >= cutoff):
                          listt.append((j, i, r))
-
 
     for r in rad:
         a = arr[:, :, r]
@@ -428,53 +359,6 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                                    # print(len(listt))
                         if (add):
                             listt.append((j, i, r))
-                            # print(x)
-    # for i in range(row):
-    #     for j in range(col):
-    #         for r in rad:
-    #             x=arr[i][j][r]
-    #             if (x>=cutoff):
-    #                 add = True
-    #                 # print(listt)
-    #                 for z in range(len(listt)):
-    #                     if (np.abs(listt[z][0] - j) <= min_radius and np.abs(listt[z][1] - i) <= min_radius):
-    #                         add = False
-    #                         if(np.abs(listt[z][0] - j) <3 and np.abs(listt[z][1] - i) < 3 and np.abs(listt[z][2] - r)<=3 ):
-    #                            newj=(listt[z][0] + j)/2.0
-    #                            newi=(listt[z][1] + i)/2.0
-    #                            newr=(listt[z][2] + r)/2.0
-    #                            print(len(listt))
-    #                            listt[z] = (newj,newi,newr)
-    #                            print(len(listt))
-    #
-    #                 if (add):
-    #                     listt.append((j, i, r))
-    #                     # print(x)
-
-
-    # cutoff=maxes[-2]
-    # for i in range(row):
-    #     for j in range(col):
-    #         for r in rad:
-    #             x=arr[i][j][r]
-    #             if (x>=cutoff):
-    #                 add=True
-    #                 # print(listt)
-    #                 for z in range (len(listt)):
-    #                     print("listt[z]",listt[z])
-    #                     if(np.abs(listt[z][0]-j)<=min_radius and np.abs(listt[z][1]-i)<=min_radius):
-    #                         add= False
-    #                         if (np.abs(listt[z][0] - j) <= 3 and np.abs(listt[z][1] - i) <=3 and np.abs(listt[z][2] - r)<=3):
-    #                             newj = (listt[z][0] + j) / 2.0
-    #                             newi = (listt[z][1] + i) / 2.0
-    #                             newr = (listt[z][2] + r) / 2.0
-    #                             print(len(listt))
-    #                             listt[z] = (newj, newi, newr)
-    #                             print(len(listt))
-    #                 if(add):
-    #                     print("adding", j,i,r)
-    #                     listt.append((j, i, r))
-    #                     # print(x)
 
 
     print(listt)
@@ -504,14 +388,15 @@ def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: f
     # print(shape)
 
     for x in rowarr:
-        print(x)
+        # print(x)
         for y in colarr:
             pivot_v = in_image[x, y]
             neighbor_hood = padded_image[x :x + k_size ,
                                         y :y + k_size]
             diff = pivot_v - neighbor_hood
             diff_gau = np.exp(-np.power(diff, 2) / (2 * sigma_color))
-            gaus = cv2.getGaussianKernel(k_size , k_size)
+            s=int(sigma_space)
+            gaus = cv2.getGaussianKernel(k_size , k_size,s)
             gaus = gaus.dot(gaus.T)
             combo = gaus * diff_gau
             result = combo * neighbor_hood/ combo.sum()
