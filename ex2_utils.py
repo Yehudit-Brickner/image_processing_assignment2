@@ -300,8 +300,6 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                         b = j-r*math.cos(deg*pi/180)
                         a = int(a)
                         b = int(b)
-                        # if(a>=0 and b>=0 and a<row and b<col):
-                        #     arr[a][b][r] = arr[a][b][r] + 1
                         for k in range(a-1,a+2):
                             for l in range(b-1,b+2):
                                 if(k >= 0 and l >= 0 and k < row and l < col):
@@ -319,25 +317,20 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
         # plt.imshow(arr[:,:,r])
         # plt.show()
     maxes.sort()
-    print(maxes)
+    # print(maxes)
     cutoff = maxes[-1]
-    print("num=",num)
+    # print("num=",num)
     if(len(maxes)>4):
-        # middle = math.ceil((num - cutoff) / (len(maxes) -1))
         middle=math.ceil((num-cutoff-maxes[-2])/(len(maxes)-2))
     else:
         if(len(maxes)>=2):
             middle=math.ceil(num-maxes[0]/len(maxes)-1)
         else:
             middle=maxes[0]
-    print("middle=",middle)
+    # print("middle=",middle)
 
-    # print("cutoff=",cutoff)
-    # middle=math.floor((middle+cutoff)/2)
-    # print("middle=", middle)
     listt = []
 
-    # add th emost correct first than add othars
     for r in rad:
         a = arr[:, :, r]
         maxnum = np.max(a)
@@ -356,9 +349,7 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                 for j in range(col):
                     x=arr[i][j][r]
                     if (x >= maxnum):
-                        # listt.append((j, i, r))
                         add = True
-                        # print(listt)
                         for z in range(len(listt)):
                             if (np.abs(listt[z][0] - j) <= min_radius and np.abs(listt[z][1] - i) <= min_radius and np.abs(listt[z][2] - r)<=min_radius):
                                 add = False
@@ -369,8 +360,6 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                                    listt[z] = (newj,newi,newr)
                         if (add):
                             listt.append((j, i, r))
-
-
     print(listt)
     return listt
 
