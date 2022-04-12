@@ -28,27 +28,20 @@ def conv1D(in_signal: np.ndarray, k_size: np.ndarray) -> np.ndarray:
         temp = k_size.copy()
         k_size = in_signal.copy()
         in_signal = temp.copy()
+
     shift = (len(k_size) - 1)
-    # flip = np.ones(len(k_size))
     new = np.zeros(len(in_signal) + shift)
-    # for i in range(len(k_size)):  # flipping the k_size vector
-    #     flip[len(k_size) - 1 - i] = k_size[i]
     flip = np.flip(k_size)
     padded = in_signal.copy()
     for k in range(shift): # padding the vector with 0
         padded = np.insert(0, 0, padded)
         padded = np.append(0, padded)
-        # print(padded)
     for i in range(len(padded) - shift):
         num = 0
         for k in range(len(k_size)):
             num += flip[k] * padded[i + k]
-        # print(num)
         new[i] = num
     return new
-
-
-
 
 
 def conv2D(in_image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
@@ -115,14 +108,6 @@ def conv2D_REFLECT(in_image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     return new_img_blurred
 
 
-
-
-
-
-
-
-
-
 def convDerivative(in_image: np.ndarray) -> (np.ndarray, np.ndarray):
     """
     Calculate gradient of an image
@@ -138,6 +123,22 @@ def convDerivative(in_image: np.ndarray) -> (np.ndarray, np.ndarray):
     return dirG, MagG
 
 
+def pascal_triangel( row: int)->np.ndarray:
+    arr=np.zeros((row,row))
+
+    arr[0][0]=1
+    arr[1][0]=1
+    arr[1][1]=1
+
+    for i in range(2,row):
+        for j in range (0,row):
+            if j==0:
+                arr[i][j]=1
+            else:
+                arr[i][j] = arr[i-1][j]+arr[i-1][j-1]
+    arr_new=arr[row-1:row,:]
+    return arr_new
+
 def blurImage1(in_image: np.ndarray, k_size: int) -> np.ndarray:
     """
     Blur an image using a Gaussian kernel
@@ -146,7 +147,12 @@ def blurImage1(in_image: np.ndarray, k_size: int) -> np.ndarray:
     :return: The Blurred image
     """
 
-    return
+    arr=pascal_triangel(k_size)
+    arr_new=arr*arr.T
+    arr_new=arr_new/np.sum(arr_new)
+    img_new=conv2D_REFLECT(in_image, arr_new)
+
+    return img_new
 
 
 def blurImage2(in_image: np.ndarray, k_size: int) -> np.ndarray:
@@ -156,8 +162,14 @@ def blurImage2(in_image: np.ndarray, k_size: int) -> np.ndarray:
     :param k_size: Kernel size
     :return: The Blurred image
     """
+    # gaus = cv2.getGaussianKernel(k_size,-1)
+    # print(gaus)
+    # gaus = gaus.dot(gaus.T)
+    # print(gaus)
+    # new_img = cv2.filter2D(in_image, -1, gaus)
+    blur = cv2.GaussianBlur(in_image, (k_size, k_size), 0)
 
-    return
+    return blur
 
 
 def edgeDetectionZeroCrossingSimple(img: np.ndarray) -> np.ndarray:
@@ -354,9 +366,7 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                                    newj=(listt[z][0] + j)/2.0
                                    newi=(listt[z][1] + i)/2.0
                                    newr=(listt[z][2] + r)/2.0
-                                   # print(len(listt))
                                    listt[z] = (newj,newi,newr)
-                                   # print(len(listt))
                         if (add):
                             listt.append((j, i, r))
 
@@ -375,6 +385,9 @@ def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: f
     :return: OpenCV implementation, my implementation
     """
 
+
+
+
     cv_image = cv2.bilateralFilter(in_image, k_size, sigma_color, sigma_space)
 
     shape = in_image.shape
@@ -385,19 +398,18 @@ def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: f
     pad= math.floor(k_size/2)
     padded_image = cv2.copyMakeBorder(in_image, pad, pad, pad, pad, cv2.BORDER_REPLICATE, None, value=0)
     image_new = np.zeros(shape)
-    # print(shape)
+
+
+    gaus = cv2.getGaussianKernel(k_size, k_size )
+    gaus = gaus.dot(gaus.T)
 
     for x in rowarr:
-        # print(x)
         for y in colarr:
             pivot_v = in_image[x, y]
             neighbor_hood = padded_image[x :x + k_size ,
                                         y :y + k_size]
             diff = pivot_v - neighbor_hood
             diff_gau = np.exp(-np.power(diff, 2) / (2 * sigma_color))
-            s=int(sigma_space)
-            gaus = cv2.getGaussianKernel(k_size , k_size,s)
-            gaus = gaus.dot(gaus.T)
             combo = gaus * diff_gau
             result = combo * neighbor_hood/ combo.sum()
             ans=result.sum()
