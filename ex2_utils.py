@@ -218,6 +218,42 @@ def edgeDetectionZeroCrossingSimple(img: np.ndarray) -> np.ndarray:
     return
 
 
+def Zero_crossing(image):
+    z_c_image = np.zeros(image.shape)
+    # For each pixel, count the number of positive
+    # and negative pixels in the neighborhood
+    for i in range(1, image.shape[0] - 1):
+        for j in range(1, image.shape[1] - 1):
+            negative_count = 0
+            positive_count = 0
+            neighbour = [image[i + 1, j - 1], image[i + 1, j], image[i + 1, j + 1], image[i, j - 1], image[i, j + 1],
+                         image[i - 1, j - 1], image[i - 1, j], image[i - 1, j + 1]]
+            d = max(neighbour)
+            e = min(neighbour)
+            for h in neighbour:
+                if h > 0:
+                    positive_count += 1
+                elif h < 0:
+                    negative_count += 1
+            # If both negative and positive values exist in
+            # the pixel neighborhood, then that pixel is a
+            # potential zero crossing
+            z_c = ((negative_count > 0) and (positive_count > 0))
+            # Change the pixel value with the maximum neighborhood
+            # difference with the pixel
+            if z_c:
+                if image[i, j] > 0:
+                    z_c_image[i, j] = image[i, j] + np.abs(e)
+                elif image[i, j] < 0:
+                    z_c_image[i, j] = np.abs(image[i, j]) + d
+    # Normalize and change datatype to 'uint8' (optional)
+    z_c_norm = z_c_image / z_c_image.max() * 255
+    z_c_image = np.uint8(z_c_norm)
+    return z_c_image
+
+
+
+
 def edgeDetectionZeroCrossingLOG(img: np.ndarray) -> np.ndarray:
     """
     Detecting edges usint "ZeroCrossingLOG" method
@@ -308,8 +344,68 @@ def edgeDetectionZeroCrossingLOG(img: np.ndarray) -> np.ndarray:
                 new_img[i][j+1] = 1
     # plt.imshow(new_img)
     # plt.show()
+    blur = cv2.GaussianBlur(img, (7, 7), 0)
+    laplacian = cv2.Laplacian(blur, cv2.CV_64F)
+    imagecv=Zero_crossing(laplacian)
+    return new_img, imagecv
+
+
+
+
+def edgeDetectionZeroCrossingLOG5(img: np.ndarray) -> np.ndarray:
+    """
+    Detecting edges usint "ZeroCrossingLOG" method
+    :param img: Input image
+    :return: opencv solution, my implementation
+    """
+
+    smooth=pascal_triangel(5)
+    smooth=smooth*smooth.T
+    img_smothed=conv2D(img,smooth)
+    lap_filter=np.array([[0,1,0],[1,-4,1],[0,1,0]])
+    filterd=conv2D(img_smothed,lap_filter)
+    shape=filterd.shape
+    row=shape[0]
+    col=shape[1]
+    new_img=np.zeros(shape)
+
+
+    # we will not include the outer edges of the image so that we can find the other edges easier
+    # we will look for places thar are {++0--} or {--0++} or {-++} or {+--} in the horizontal or vertical axis
+    # where the 0 is the spot i am looking at or the lone -/+ is the spot i am looking at
+    # if the spot is a edge it will come up true for one of the options
+    for i in range (2,row-2):
+        for j in range(2,col-2):
+            center =filterd[i][j]
+            up= filterd[i-1][j]
+            up2=filterd[i-2][j]
+            down =filterd[i+1][j]
+            down2 = filterd[i+2][j]
+            left= filterd[i][j-1]
+            left2 = filterd[i][j-2]
+            right=filterd[i][j+1]
+            right2 = filterd[i][j+2]
+            if(center==0):
+                if(right*left<0 and right2*left2<0 and right2*right>0 and left2*left>0):
+                    new_img[i][j]=1
+                if(up*down<0 and up2*down<0 and up*up2>0 and down2*down>0):
+                    new_img[i][j] = 1
+            elif (center*up<0 and center*up2<0 and up2*up>0):
+                new_img[i][j] = 1
+                new_img[i-1][j] = 1
+            elif (center * down < 0 and center*down2<0 and down2*down>0):
+                new_img[i][j] = 1
+                new_img[i+1][j] = 1
+            elif (center*left<0 and center*left2<0 and left2*left>0):
+                new_img[i][j] = 1
+                new_img[i][j-1] = 1
+            elif (center*right<0 and center*right2<0 and right2*right>0):
+                new_img[i][j] = 1
+                new_img[i][j+1] = 1
 
     return new_img
+
+
 
 
 def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
@@ -329,7 +425,7 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     img=conv2D(img,ker)
     # plt.imshow(img)
     # plt.show()
-    edge_img = edgeDetectionZeroCrossingLOG(img)
+    edge_img = edgeDetectionZeroCrossingLOG5(img)
     # plt.imshow(edge_img)
     # plt.show()
     shape = edge_img.shape
