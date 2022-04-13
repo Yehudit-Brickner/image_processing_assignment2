@@ -24,18 +24,28 @@ def conv1D(in_signal: np.ndarray, k_size: np.ndarray) -> np.ndarray:
     :param k_size: 1-D array as a kernel
     :return: The convolved array
     """
+    # check if the in_sugnal is bigger than the kernel, if not switch them
     if (len(k_size) > len(in_signal)):
         temp = k_size.copy()
         k_size = in_signal.copy()
         in_signal = temp.copy()
 
+    # the amount of zeros needed to pad each end of the in_signal
     shift = (len(k_size) - 1)
+
+    # creating the new array that will be returned
     new = np.zeros(len(in_signal) + shift)
+
+    # fliiping the kernel
     flip = np.flip(k_size)
+
+    # creating a copy of the in_signal and paddig with zeros
     padded = in_signal.copy()
-    for k in range(shift): # padding the vector with 0
+    for k in range(shift):
         padded = np.insert(0, 0, padded)
         padded = np.append(0, padded)
+
+    # doing the mulitiplacation for each value and putting into its spot in the new array
     for i in range(len(padded) - shift):
         num = 0
         for k in range(len(k_size)):
@@ -52,6 +62,7 @@ def conv2D(in_image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     :return: The convolved image
     """
 
+    # finding the size of the row and col for the image and the kernel
     shape_ker = kernel.shape
     ker_row = shape_ker[0]
     ker_col = shape_ker[1]
@@ -60,12 +71,20 @@ def conv2D(in_image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     img_row = shape_img[0]
     img_col = shape_img[1]
 
+    # creating a new array the size of the image
     new_img_blurred = np.zeros(shape_img)
+
+    # flipping the kernel
     kernel = np.flip(kernel)
+
+    # finding half of the kerels row and column to know how much to pad the image
     r_skip = math.floor(ker_row / 2)
     c_skip = math.floor(ker_col / 2)
 
+    # creating a padded image
     padded_image = cv2.copyMakeBorder(in_image, r_skip, r_skip, c_skip, c_skip, cv2.BORDER_REPLICATE, None, value=0)
+
+    # doing the multiplacation to find the new value for each pixel
     for i in range(img_row):
         for j in range(img_col):
             num = 0
@@ -84,6 +103,8 @@ def conv2D_REFLECT(in_image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     :param kernel: A kernel
     :return: The convolved image
     """
+
+    # this is the same as conv2d but the padded image is reflected and not replicated
 
     shape_ker = kernel.shape
     ker_row = shape_ker[0]
@@ -114,28 +135,41 @@ def convDerivative(in_image: np.ndarray) -> (np.ndarray, np.ndarray):
     :param in_image: Grayscale iamge
     :return: (directions, magnitude)
     """
+    # kernel for derivative using x
     ker = np.array([[1, 0, -1]])
+
+    # create the transpose for the y derivative
     kerT = np.transpose(ker)
+
+    # create new images- using conv2d_reflect because cv2 uses reflect when calc the derivative
     img_x = conv2D_REFLECT(in_image, ker)
     img_y = conv2D_REFLECT(in_image, kerT)
+
+    # calculating the magnitude and the direction
     MagG = np.sqrt((img_x * img_x ) + (img_y * img_y))
     dirG = np.arctan2(img_y, img_x).astype(np.float64)
     return dirG, MagG
 
 
 def pascal_triangel( row: int)->np.ndarray:
+
+    #creating an array
     arr=np.zeros((row,row))
 
+    #putting in the first to rows of pascals triangle
     arr[0][0]=1
     arr[1][0]=1
     arr[1][1]=1
 
+    # calculating the rest of the triangle
     for i in range(2,row):
         for j in range (0,row):
-            if j==0:
+            if j==0: # the first column will always be a 1
                 arr[i][j]=1
             else:
                 arr[i][j] = arr[i-1][j]+arr[i-1][j-1]
+
+    # get the last row of the array
     arr_new=arr[row-1:row,:]
     return arr_new
 
@@ -146,10 +180,16 @@ def blurImage1(in_image: np.ndarray, k_size: int) -> np.ndarray:
     :param k_size: Kernel size
     :return: The Blurred image
     """
-
+    # get the k_size row of the pascal triangle
     arr=pascal_triangel(k_size)
+
+    # create a 2d array by multipling by its transpose
     arr_new=arr*arr.T
+
+    # divide by its sum
     arr_new=arr_new/np.sum(arr_new)
+
+    # create a new image using conv2d_reflect
     img_new=conv2D_REFLECT(in_image, arr_new)
 
     return img_new
@@ -162,11 +202,7 @@ def blurImage2(in_image: np.ndarray, k_size: int) -> np.ndarray:
     :param k_size: Kernel size
     :return: The Blurred image
     """
-    # gaus = cv2.getGaussianKernel(k_size,-1)
-    # print(gaus)
-    # gaus = gaus.dot(gaus.T)
-    # print(gaus)
-    # new_img = cv2.filter2D(in_image, -1, gaus)
+
     blur = cv2.GaussianBlur(in_image, (k_size, k_size), 0)
 
     return blur
@@ -189,43 +225,85 @@ def edgeDetectionZeroCrossingLOG(img: np.ndarray) -> np.ndarray:
     :return: opencv solution, my implementation
     """
     # smooth=np.array([[1,2,1],[2,4,2],[1,2,1]])
-    # # smooth=smooth/np.sum(smooth)
-    smooth=np.array([[1,4,7,4,1],[4,16,26,16,4],[7,26,41,26,7],[4,16,26,16,4],[1,4,7,4,1]])
+    # smooth=smooth/np.sum(smooth)
+    # smooth=np.array([[1,4,7,4,1],[4,16,26,16,4],[7,26,41,26,7],[4,16,26,16,4],[1,4,7,4,1]])
     smooth = np.array([[0,0,1,2,1,0,0], [0,3,13,22,13,3,0], [1,13,59,97,59,13,1], [2,22,97,159,97,22,2],[1,13,59,97,59,13,1],[0,3,13,22,13,3,0],[0,0,1,2,1,0,0]])
-    # # smooth = smooth / np.sum(smooth)
+    smooth=pascal_triangel(7)
+    smooth=smooth*smooth.T
+    # print(smooth)
+    # smooth = smooth / np.sum(smooth)
     img_smothed=conv2D(img,smooth)
-
+    # img_smothed=cv2.filter2D(img,-1, smooth, borderType=cv2.BORDER_REPLICATE)
+    # img_smothed = cv2.GaussianBlur(img, (7, 7), 0)
+    # plt.imshow(img_smothed)
+    # plt.show()
     lap_filter=np.array([[0,1,0],[1,-4,1],[0,1,0]])
     filterd=conv2D(img_smothed,lap_filter)
+    # plt.imshow(filterd)
+    # plt.show()
+    # filterd=cv2.filter2D(img_smothed,-1,lap_filter, borderType=cv2.BORDER_REPLICATE)
     # plt.imshow(filterd)
     # plt.show()
     shape=filterd.shape
     row=shape[0]
     col=shape[1]
     new_img=np.zeros(shape)
-    #we will not include the edges so that we can find the other edges easier
-    for i in range (1,row-1):
-        for j in range(1,col-1):
+    # we will not include the outer edges of the image so that we can find the other edges easier
+    # for i in range (1,row-1):
+    #     for j in range(1,col-1):
+    #         center =filterd[i][j]
+    #         up= filterd[i-1][j]
+    #         down =filterd[i+1][j]
+    #         left= filterd[i][j-1]
+    #         right=filterd[i][j+1]
+    #         if(center==0):
+    #             if(right*left<0):
+    #                 new_img[i][j]=1
+    #             if(up*down<0):
+    #                 new_img[i][j] = 1
+    #         elif (center*up<0):
+    #             new_img[i][j] = 1
+    #             new_img[i-1][j] = 1
+    #         elif (center * down < 0):
+    #             new_img[i][j] = 1
+    #             new_img[i+1][j] = 1
+    #         elif (center*left<0):
+    #             new_img[i][j] = 1
+    #             new_img[i][j-1] = 1
+    #         elif (center*right<0):
+    #             new_img[i][j] = 1
+    #             new_img[i][j+1] = 1
+
+    # we will not include the outer edges of the image so that we can find the other edges easier
+    # we will look for places thar are {++0--} or {--0++} or {-++} or {+--} in the horizontal or vertical axis
+    # where the 0 is the spot i am looking at or the lone -/+ is the spot i am looking at
+    # if the spot is a edge it will come up true for one of the options
+    for i in range (2,row-2):
+        for j in range(2,col-2):
             center =filterd[i][j]
             up= filterd[i-1][j]
+            up2=filterd[i-2][j]
             down =filterd[i+1][j]
+            down2 = filterd[i+2][j]
             left= filterd[i][j-1]
+            left2 = filterd[i][j-2]
             right=filterd[i][j+1]
+            right2 = filterd[i][j+2]
             if(center==0):
-                if(right*left<0):
+                if(right*left<0 and right2*left2<0 and right2*right>0 and left2*left>0):
                     new_img[i][j]=1
-                if(up*down<0):
+                if(up*down<0 and up2*down<0 and up*up2>0 and down2*down>0):
                     new_img[i][j] = 1
-            elif (center*up<0):
+            elif (center*up<0 and center*up2<0 and up2*up>0):
                 new_img[i][j] = 1
                 new_img[i-1][j] = 1
-            elif (center * down < 0):
+            elif (center * down < 0 and center*down2<0 and down2*down>0):
                 new_img[i][j] = 1
                 new_img[i+1][j] = 1
-            elif (center*left<0):
+            elif (center*left<0 and center*left2<0 and left2*left>0):
                 new_img[i][j] = 1
                 new_img[i][j-1] = 1
-            elif (center*right<0):
+            elif (center*right<0 and center*right2<0 and right2*right>0):
                 new_img[i][j] = 1
                 new_img[i][j+1] = 1
     # plt.imshow(new_img)
@@ -305,29 +383,28 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                                 if(k >= 0 and l >= 0 and k < row and l < col):
                                     arr[k][l][r] = arr[k][l][r]+1
     maxes=[]
-    num = 0
+    # num = 0
     for r in rad:
         a=arr[:,:,r]
         maxnum = np.max(a)
-        # print( "max for rad ", r ," is ",maxnum)
-        biggest=0
         if maxnum not in maxes:
-            num+=maxnum
+            # n\um+=maxnum
             maxes.append(maxnum)
         # plt.imshow(arr[:,:,r])
         # plt.show()
     maxes.sort()
-    # print(maxes)
+    num=sum(maxes)
+    print(maxes)
     cutoff = maxes[-1]
     # print("num=",num)
     if(len(maxes)>4):
-        middle=math.ceil((num-cutoff-maxes[-2])/(len(maxes)-2))
+        middle=math.ceil((num-cutoff-maxes[-2]-maxes[-3])/(len(maxes)-3))
     else:
         if(len(maxes)>=2):
             middle=math.ceil(num-maxes[0]/len(maxes)-1)
         else:
             middle=maxes[0]
-    # print("middle=",middle)
+    print("middle=",middle)
 
     listt = []
 
@@ -364,8 +441,7 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     return listt
 
 
-def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: float, sigma_space: float) -> (
-        np.ndarray, np.ndarray):
+def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: float, sigma_space: float) -> (np.ndarray, np.ndarray):
     """
     :param in_image: input image
     :param k_size: Kernel size
