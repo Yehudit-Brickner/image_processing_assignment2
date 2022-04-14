@@ -417,7 +417,7 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                             for l in range(b-1,b+2):
                                 if(k >= 0 and l >= 0 and k < row and l < col):
                                     if(k==a and l==b):
-                                        arr[k][l][r] = arr[k][l][r] + 1
+                                        arr[k][l][r] = arr[k][l][r] + 1.2
                                     else:
                                         arr[k][l][r] = arr[k][l][r]+1
 
@@ -470,18 +470,21 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
         a = arr[:, :, r]
         maxnum = np.max(a)
         if(maxnum>=middle):
+            cuutt=(maxnum+middle)/2
             for i in range(row):
                 for j in range(col):
                     x=arr[i][j][r]
-                    if (x >= maxnum):
+                    # if(x>=maxnum):
+                    if (x >= cuutt):
                         add = True
                         for z in range(len(listt)):
-                            if (np.abs(listt[z][0] - j) <= 3*min_radius/5 and np.abs(listt[z][1] - i) <=3*min_radius/5 and np.abs(listt[z][2] - r)<=3*min_radius/5):
+                            c=r/2
+                            if (np.abs(listt[z][0] - j) <= c and np.abs(listt[z][1] - i) <= c and np.abs(listt[z][2] - r)<= c):
                                 add = False
                                 if(np.abs(listt[z][0] - j) <3 and np.abs(listt[z][1] - i) < 3 and np.abs(listt[z][2] - r)<=3):
-                                   newj=(listt[z][0] + j)/2.0
-                                   newi=(listt[z][1] + i)/2.0
-                                   newr=(listt[z][2] + r)/2.0
+                                   newj = (listt[z][0] + j)/2.0
+                                   newi = (listt[z][1] + i)/2.0
+                                   newr = (listt[z][2] + r)/2.0
                                    listt[z] = (newj,newi,newr)
                         if (add):
                             listt.append((j, i, r))
