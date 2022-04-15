@@ -459,13 +459,14 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                 for j in range(col):
                     x = arr[i][j][r]
                     if (x >= cutoff):
-                         listt.append((j, i, r))
+                         listt.append((j, i, r,x))
 
     # we will repaete the same thing for all layers that ma is bigger or equal to middle
     # but befor dding the circle to the list we will check if it is really similar to a circle in the list
     # it is similar if the i j and r are all within min_radius from a circle that exsits
     # if its in that area we will check if the difference is up to 3 away
     # if so we will update that entry in the list by averaging the values
+    c = min_radius / 2
     for r in rad:
         a = arr[:, :, r]
         maxnum = np.max(a)
@@ -478,20 +479,43 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                     if (x >= cuutt):
                         add = True
                         for z in range(len(listt)):
-                            c=r/2
+                            # c=min_radius/2
                             if (np.abs(listt[z][0] - j) <= c and np.abs(listt[z][1] - i) <= c and np.abs(listt[z][2] - r)<= c):
                                 add = False
                                 if(np.abs(listt[z][0] - j) <3 and np.abs(listt[z][1] - i) < 3 and np.abs(listt[z][2] - r)<=3):
                                    newj = (listt[z][0] + j)/2.0
                                    newi = (listt[z][1] + i)/2.0
                                    newr = (listt[z][2] + r)/2.0
-                                   listt[z] = (newj,newi,newr)
+                                   newx = (listt[z][3] + x)/2.0
+                                   listt[z] = (newj,newi,newr, newx)
                         if (add):
-                            listt.append((j, i, r))
+                            listt.append((j, i, r,x))
+
+
+    # goingthrough the list and removing smaller circle from bigger circle
+    remove_list=[]
+    for l in range(len(listt)):
+        for k in range(len(listt)):
+            if(l!=k):
+                inside=in_circle(listt[l][0],listt[l][1],listt[l][2],listt[l][3],listt[k][0],listt[k][1],listt[k][2],listt[k][3])
+                if inside==1:
+                    if l not in remove_list:
+                        remove_list.append(l)
+    remove_list.sort(reverse=True)
+    print(remove_list)
+    for x in remove_list:
+        del listt[x]
+
     print(listt)
     return listt
 
 
+def in_circle( x1, y1, r1,ac1, x2, y2, r2, ac2 ):
+    if(r2>r1 and ac2>ac1):
+        dist=math.sqrt((x1-x2)**2 +(y1-y2)**2)
+        if dist<r2:
+            return 1
+    return 0
 
 def houghCircle1(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     """
