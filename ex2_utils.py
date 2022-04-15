@@ -479,7 +479,6 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                     if (x >= cuutt):
                         add = True
                         for z in range(len(listt)):
-                            # c=min_radius/2
                             if (np.abs(listt[z][0] - j) <= c and np.abs(listt[z][1] - i) <= c and np.abs(listt[z][2] - r)<= c):
                                 add = False
                                 if(np.abs(listt[z][0] - j) <3 and np.abs(listt[z][1] - i) < 3 and np.abs(listt[z][2] - r)<=3):
