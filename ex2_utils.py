@@ -346,6 +346,13 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     :return: A list containing the detected circles,
                 [(x,y,radius),(x,y,radius),...]
     """
+
+    """
+    the threshold for finding the circle depend om the picture and the values in the hough transform
+    """
+
+
+
     # makeing a 3x3 kernel to blur the image
     ker=np.array([[1,1,1],[1,1,1],[1,1,1]])/9
     img=conv2D(img,ker)
