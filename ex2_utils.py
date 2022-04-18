@@ -192,8 +192,6 @@ def blurImage1(in_image: np.ndarray, k_size: int) -> np.ndarray:
 
     # create a new image using conv2d_reflect
     img_new=conv2D_REFLECT(in_image, arr_new)
-    print(img_new)
-    print()
     return img_new
 
 
@@ -206,7 +204,6 @@ def blurImage2(in_image: np.ndarray, k_size: int) -> np.ndarray:
     """
 
     blur = cv2.GaussianBlur(in_image, (k_size, k_size)-1)
-    print(blur)
     return blur
 
 
