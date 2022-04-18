@@ -203,7 +203,7 @@ def blurImage2(in_image: np.ndarray, k_size: int) -> np.ndarray:
     :return: The Blurred image
     """
 
-    blur = cv2.GaussianBlur(in_image, (k_size, k_size)-1)
+    blur = cv2.GaussianBlur(in_image, (k_size, k_size),-1)
     return blur
 
 
