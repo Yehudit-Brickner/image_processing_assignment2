@@ -184,7 +184,7 @@ def blurImage1(in_image: np.ndarray, k_size: int) -> np.ndarray:
     # get the k_size row of the pascal triangle
     arr=pascal_triangel(k_size)
 
-    # create a 2d array by multipling by its transpose
+    # create a 2d array by multiplying by its transpose
     arr_new=arr*arr.T
 
     # divide by its sum
@@ -192,7 +192,8 @@ def blurImage1(in_image: np.ndarray, k_size: int) -> np.ndarray:
 
     # create a new image using conv2d_reflect
     img_new=conv2D_REFLECT(in_image, arr_new)
-
+    print(img_new)
+    print()
     return img_new
 
 
@@ -204,8 +205,8 @@ def blurImage2(in_image: np.ndarray, k_size: int) -> np.ndarray:
     :return: The Blurred image
     """
 
-    blur = cv2.GaussianBlur(in_image, (k_size, k_size), 0)
-
+    blur = cv2.GaussianBlur(in_image, (k_size, k_size)-1)
+    print(blur)
     return blur
 
 
@@ -360,7 +361,7 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     pi = math.pi
 
     # to find hough circles you need to take all pixels that are edges and find where they map to in the hough space for all radius and all degres,
-    # but that is a lot to calcultae espiecially if it is a big image and there are a lot of edges and a big span of radius to chek
+    # but that is a lot to calcultae espiecially if it is a big image and there are a lot of edges and a big span of radius to cheeck
     # so i decided that depending on the size of the image i will only check part of the column and rows.
     # and that i will check part of the radius depending or how many there are.
     # and that the degrees will be in increments of 12 always.
@@ -400,7 +401,7 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     # we will go through the image and if the pixel is an edge, we will transform to the hough space.
     # to transform to the hough space we used the algo in rows 412-413.
     # we will change the a and b to ints so that we can mark the spot in the hough space array
-    # we will mark a 3x3 square around that pixel if its oon the array
+    # we will mark a 3x3 square around that pixel if its in the array we will make the cenre bigger by 1.2 and theotside bigger by 1
     # the algorthm for the transform was taken from wikipedia
     # https://en.wikipedia.org/wiki/Circle_Hough_Transform
     for i in rowarr:
@@ -435,7 +436,7 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
             maxes.append(maxnum)
     maxes.sort()
     num=sum(maxes)
-    print(maxes)
+    # print(maxes)
     if(len(maxes)>4):
         middle=math.ceil((num-maxes[-1]-maxes[-2]-maxes[-3])/(len(maxes)-3))
     else:
@@ -443,12 +444,13 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
             middle=math.ceil(num-maxes[0]/len(maxes)-1)
         else:
             middle=maxes[0]
-    print("middle=",middle)
+    # print("middle=",middle)
 
-    # we will create a list that will return the values of the middle of the circles and radius
+    # we will create a list that will return at the end
+    # the list will have tuples with these values- middle of the circle and radius, and correctness
     # we will go through the 3d array and check the layers that the max value is the same as cutoff
-    # we will go through those layers and if the pixels vale is bigger or equal to cutoff we will add it to the list
-    # when we wdd it to the list we will switch the i and j cordinates so that the middle of the circle is in the correct are in the picture
+    # we will go through those layers and if the pixels value is bigger or equal to cutoff we will add it to the list
+    # when we wdd it to the list we will switch the i and j cordinates so that the middle of the circle is in the correct position in the picture
     listt = []
     cutoff = maxes[-1] # biggest value in maxes
     for r in rad:
@@ -461,9 +463,10 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                     if (x >= cutoff):
                          listt.append((j, i, r,x))
 
-    # we will repaete the same thing for all layers that ma is bigger or equal to middle
-    # but befor dding the circle to the list we will check if it is really similar to a circle in the list
-    # it is similar if the i j and r are all within min_radius from a circle that exsits
+    # we will repeat the same thing for all layers that maxnum is bigger or equal to middle
+    # if the spot is bigger or equal to the average of maxnum and middle
+    # but before dding the circle to the list we will check if it is really similar to a circle in the list
+    # if it is similar if the i j and r are all within min_radius/2 from a circle that exsits
     # if its in that area we will check if the difference is up to 3 away
     # if so we will update that entry in the list by averaging the values
     c = min_radius / 2
@@ -475,7 +478,6 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
             for i in range(row):
                 for j in range(col):
                     x=arr[i][j][r]
-                    # if(x>=maxnum):
                     if (x >= cuutt):
                         add = True
                         for z in range(len(listt)):
@@ -491,7 +493,7 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                             listt.append((j, i, r,x))
 
 
-    # goingthrough the list and removing smaller circle from bigger circle
+    # going through the list and removing smaller circle from bigger circle if the bigger circle is more accurate
     remove_list=[]
     for l in range(len(listt)):
         for k in range(len(listt)):
@@ -501,176 +503,177 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
                     if l not in remove_list:
                         remove_list.append(l)
     remove_list.sort(reverse=True)
-    print(remove_list)
+    # print(remove_list)
     for x in remove_list:
         del listt[x]
 
-    print(listt)
+    # print(listt)
     return listt
 
 
 def in_circle( x1, y1, r1,ac1, x2, y2, r2, ac2 ):
+    # function to check if a circle is inside another circle
     if(r2>r1 and ac2>ac1):
         dist=math.sqrt((x1-x2)**2 +(y1-y2)**2)
         if dist<r2:
             return 1
     return 0
 
-def houghCircle1(img: np.ndarray, min_radius: int, max_radius: int) -> list:
-    """
-    Find Circles in an image using a Hough Transform algorithm extension
-    To find Edges you can Use OpenCV function: cv2.Canny
-    :param img: Input image
-    :param min_radius: Minimum circle radius
-    :param max_radius: Maximum circle radius
-    :return: A list containing the detected circles,
-                [(x,y,radius),(x,y,radius),...]
-    """
-
-    ker = np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]]) / 9
-    img = conv2D(img, ker)
-    img=img*255
-    img=np.uint8(img)
-    edge_img=cv2.Canny(img,100,200)
-
-    shape = edge_img.shape
-    row = shape[0]
-    col = shape[1]
-    pi = math.pi
-
-
-    if (row <=300 and col <=300):
-        rowarr = np.arange(0, row, 1).astype(int)
-        colarr = np.arange(0, col, 1).astype(int)
-    elif (row <=450and col <=450):
-        rowarr = np.arange(0, row, 2).astype(int)
-        colarr = np.arange(0, col, 2).astype(int)
-    elif (row <= 600 and col <=600):
-        rowarr = np.arange(0, row, 3).astype(int)
-        colarr = np.arange(0, col, 3).astype(int)
-    elif (row <=800 and col <=800):
-        rowarr = np.arange(0, row, 4).astype(int)
-        colarr = np.arange(0, col, 4).astype(int)
-    else:
-        rowarr = np.arange(0, row, 10).astype(int)
-        colarr = np.arange(0, col, 10).astype(int)
-
-    if(max_radius-min_radius<=30):
-        rad = np.arange(min_radius, max_radius,1)
-        np.append(rad, max_radius)
-    elif (max_radius - min_radius <= 50):
-        rad = np.arange(min_radius, max_radius, 2)
-        np.append(rad, max_radius)
-    else :
-        rad = np.arange(min_radius, max_radius, 3)
-        np.append(rad, max_radius)
-
-    degres = np.arange(0, 360, 8)
-    arr = np.zeros((row, col, max_radius))
-
-    for i in rowarr:
-        for j in colarr:
-            x = edge_img[i][j]
-            if x != 0:
-                for r in rad:
-                    for deg in degres:
-                        a = i-r*math.sin(deg*pi/180)
-                        b = j-r*math.cos(deg*pi/180)
-                        a = int(a)
-                        b = int(b)
-                        for k in range(a-1,a+2):
-                            for l in range(b-1,b+2):
-                                if(k >= 0 and l >= 0 and k < row and l < col):
-                                    arr[k][l][r] = arr[k][l][r]+1
-
-
-    maxes=[]
-    for r in rad:
-        a=arr[:,:,r]
-        maxnum = np.max(a)
-        if maxnum not in maxes:
-            maxes.append(maxnum)
-    maxes.sort()
-    num=sum(maxes)
-
-    print(maxes)
-    print("num=",num)
-    if(len(maxes)>10):
-        middle = math.ceil((num - maxes[-1]- maxes[-2] - maxes[-3] - maxes[-4]-maxes[-5])/ (len(maxes) - 5))
-    elif(len(maxes)>4):
-        middle=math.ceil((num-maxes[-1]-maxes[-2])/(len(maxes)-2))
-    elif(len(maxes)>=2):
-        middle=math.ceil((num-maxes[0])/len(maxes)-1)
-    else:
-        middle=maxes[0]
-        if middle<1:
-            middle=1
-    print("middle=",middle)
-    cutoff = maxes[-1]
-    listt = []
-
-    # for r in rad:
-    #     a = arr[:, :, r]
-    #     maxnum = np.max(a)
-    #     if(maxnum==cutoff):
-    #         for i in range(row):
-    #             for j in range(col):
-    #                 x = arr[i][j][r]
-    #                 if (x >= cutoff):
-    #                      listt.append((j, i, r))
-    #
-    # reset=np.arange(min_radius,max_radius+1,10)
-    # if reset[-1]!=max_radius:
-    #     reset = np.append(max_radius,reset)
-
-    # print(reset)
-    # print(reset.shape[0])
-    # cutoffs=[]
-    # for idx in range (reset.shape[0]-1):
-    #     maxes2 = []
-    #     for y in range(reset[idx],reset[idx+1]):
-    #         a = arr[:, :, y]
-    #         maxnum = np.max(a)
-    #         maxes2.append(maxnum)
-    #     print("maxes2", maxes2)
-    #     maxes2.sort()
-    #     cutoffs.append(maxes2[-1])
-    #     maxes2.clear()
-    # print(cutoffs)
-    #
-    # cuuttt=sum(cutoffs)/len(cutoffs)
-    # print(cuuttt)
-
-
-    for r in rad:
-        # count=0
-        # for y in reset:
-        #    if r<=y:
-        #        if(count<len(cutoffs)):
-        #             cut=cutoffs[count]
-        #    else:
-        #        count=count+1
-        a = arr[:, :, r]
-        maxnum = np.max(a)
-        if(maxnum>=middle):
-            for i in range(row):
-                for j in range(col):
-                    x=arr[i][j][r]
-                    if (x >= middle):
-                        add = True
-                        for z in range(len(listt)):
-                            if (np.abs(listt[z][0] - j) <= min_radius and np.abs(listt[z][1] - i) <= min_radius and np.abs(listt[z][2] - r)<=min_radius):
-                                add = False
-                                if(np.abs(listt[z][0] - j) <3 and np.abs(listt[z][1] - i) < 3 and np.abs(listt[z][2] - r)<=3):
-                                   newj=(listt[z][0] + j)/2.0
-                                   newi=(listt[z][1] + i)/2.0
-                                   newr=(listt[z][2] + r)/2.0
-                                   listt[z] = (newj,newi,newr)
-                        if (add):
-                            listt.append((j, i, r))
-
-    print(listt)
-    return listt
+# def houghCircle1(img: np.ndarray, min_radius: int, max_radius: int) -> list:
+#     """
+#     Find Circles in an image using a Hough Transform algorithm extension
+#     To find Edges you can Use OpenCV function: cv2.Canny
+#     :param img: Input image
+#     :param min_radius: Minimum circle radius
+#     :param max_radius: Maximum circle radius
+#     :return: A list containing the detected circles,
+#                 [(x,y,radius),(x,y,radius),...]
+#     """
+#
+#     ker = np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]]) / 9
+#     img = conv2D(img, ker)
+#     img=img*255
+#     img=np.uint8(img)
+#     edge_img=cv2.Canny(img,100,200)
+#
+#     shape = edge_img.shape
+#     row = shape[0]
+#     col = shape[1]
+#     pi = math.pi
+#
+#
+#     if (row <=300 and col <=300):
+#         rowarr = np.arange(0, row, 1).astype(int)
+#         colarr = np.arange(0, col, 1).astype(int)
+#     elif (row <=450and col <=450):
+#         rowarr = np.arange(0, row, 2).astype(int)
+#         colarr = np.arange(0, col, 2).astype(int)
+#     elif (row <= 600 and col <=600):
+#         rowarr = np.arange(0, row, 3).astype(int)
+#         colarr = np.arange(0, col, 3).astype(int)
+#     elif (row <=800 and col <=800):
+#         rowarr = np.arange(0, row, 4).astype(int)
+#         colarr = np.arange(0, col, 4).astype(int)
+#     else:
+#         rowarr = np.arange(0, row, 10).astype(int)
+#         colarr = np.arange(0, col, 10).astype(int)
+#
+#     if(max_radius-min_radius<=30):
+#         rad = np.arange(min_radius, max_radius,1)
+#         np.append(rad, max_radius)
+#     elif (max_radius - min_radius <= 50):
+#         rad = np.arange(min_radius, max_radius, 2)
+#         np.append(rad, max_radius)
+#     else :
+#         rad = np.arange(min_radius, max_radius, 3)
+#         np.append(rad, max_radius)
+#
+#     degres = np.arange(0, 360, 8)
+#     arr = np.zeros((row, col, max_radius))
+#
+#     for i in rowarr:
+#         for j in colarr:
+#             x = edge_img[i][j]
+#             if x != 0:
+#                 for r in rad:
+#                     for deg in degres:
+#                         a = i-r*math.sin(deg*pi/180)
+#                         b = j-r*math.cos(deg*pi/180)
+#                         a = int(a)
+#                         b = int(b)
+#                         for k in range(a-1,a+2):
+#                             for l in range(b-1,b+2):
+#                                 if(k >= 0 and l >= 0 and k < row and l < col):
+#                                     arr[k][l][r] = arr[k][l][r]+1
+#
+#
+#     maxes=[]
+#     for r in rad:
+#         a=arr[:,:,r]
+#         maxnum = np.max(a)
+#         if maxnum not in maxes:
+#             maxes.append(maxnum)
+#     maxes.sort()
+#     num=sum(maxes)
+#
+#     print(maxes)
+#     print("num=",num)
+#     if(len(maxes)>10):
+#         middle = math.ceil((num - maxes[-1]- maxes[-2] - maxes[-3] - maxes[-4]-maxes[-5])/ (len(maxes) - 5))
+#     elif(len(maxes)>4):
+#         middle=math.ceil((num-maxes[-1]-maxes[-2])/(len(maxes)-2))
+#     elif(len(maxes)>=2):
+#         middle=math.ceil((num-maxes[0])/len(maxes)-1)
+#     else:
+#         middle=maxes[0]
+#         if middle<1:
+#             middle=1
+#     print("middle=",middle)
+#     cutoff = maxes[-1]
+#     listt = []
+#
+#     # for r in rad:
+#     #     a = arr[:, :, r]
+#     #     maxnum = np.max(a)
+#     #     if(maxnum==cutoff):
+#     #         for i in range(row):
+#     #             for j in range(col):
+#     #                 x = arr[i][j][r]
+#     #                 if (x >= cutoff):
+#     #                      listt.append((j, i, r))
+#     #
+#     # reset=np.arange(min_radius,max_radius+1,10)
+#     # if reset[-1]!=max_radius:
+#     #     reset = np.append(max_radius,reset)
+#
+#     # print(reset)
+#     # print(reset.shape[0])
+#     # cutoffs=[]
+#     # for idx in range (reset.shape[0]-1):
+#     #     maxes2 = []
+#     #     for y in range(reset[idx],reset[idx+1]):
+#     #         a = arr[:, :, y]
+#     #         maxnum = np.max(a)
+#     #         maxes2.append(maxnum)
+#     #     print("maxes2", maxes2)
+#     #     maxes2.sort()
+#     #     cutoffs.append(maxes2[-1])
+#     #     maxes2.clear()
+#     # print(cutoffs)
+#     #
+#     # cuuttt=sum(cutoffs)/len(cutoffs)
+#     # print(cuuttt)
+#
+#
+#     for r in rad:
+#         # count=0
+#         # for y in reset:
+#         #    if r<=y:
+#         #        if(count<len(cutoffs)):
+#         #             cut=cutoffs[count]
+#         #    else:
+#         #        count=count+1
+#         a = arr[:, :, r]
+#         maxnum = np.max(a)
+#         if(maxnum>=middle):
+#             for i in range(row):
+#                 for j in range(col):
+#                     x=arr[i][j][r]
+#                     if (x >= middle):
+#                         add = True
+#                         for z in range(len(listt)):
+#                             if (np.abs(listt[z][0] - j) <= min_radius and np.abs(listt[z][1] - i) <= min_radius and np.abs(listt[z][2] - r)<=min_radius):
+#                                 add = False
+#                                 if(np.abs(listt[z][0] - j) <3 and np.abs(listt[z][1] - i) < 3 and np.abs(listt[z][2] - r)<=3):
+#                                    newj=(listt[z][0] + j)/2.0
+#                                    newi=(listt[z][1] + i)/2.0
+#                                    newr=(listt[z][2] + r)/2.0
+#                                    listt[z] = (newj,newi,newr)
+#                         if (add):
+#                             listt.append((j, i, r))
+#
+#     print(listt)
+#     return listt
 
 
 
@@ -702,7 +705,7 @@ def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: f
     gaus = cv2.getGaussianKernel(k_size, k_size )
     gaus = gaus.dot(gaus.T)
 
-    # creating all the kernels needed and combing them together and multiplying by the neighborhood
+    # creating all the kernels needed and combining them together and multiplying by the neighborhood
     # putting into the new image the sum of the all that
     for x in rowarr:
         for y in colarr:
