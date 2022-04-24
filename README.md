@@ -45,5 +45,13 @@ In this assignment we had to write 8 functions:
 
   <br>
   houghCircle
+  <br> red circles are circles that my algo found and green are circles that cv found
   
+  ![image](https://user-images.githubusercontent.com/79203360/164967497-62e3ddf9-9c1b-467e-8937-f84fb598269c.png)
+
+  <br>
   bilateral_filter_implement
+  <br> my impementation is on thop open cv is on the bottom
+  
+ ![image](https://user-images.githubusercontent.com/79203360/164967714-b69c5093-3174-4c39-80d7-056e5b48e8db.png)
+
