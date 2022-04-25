@@ -61,7 +61,9 @@ In this assignment we had to write 8 functions:
 
 
   #### bilateral_filter_implement
-  <br> my impementation is on thop open cv is on the bottom
+  <br> open cv is on theright mine is on the left  
   
- ![image](https://user-images.githubusercontent.com/79203360/164967714-b69c5093-3174-4c39-80d7-056e5b48e8db.png)
+  ![image](https://user-images.githubusercontent.com/79203360/165141988-21ede4eb-551b-4968-8e25-f21d7ba52f54.png)
+
+
 
