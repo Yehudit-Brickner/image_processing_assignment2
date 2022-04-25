@@ -56,7 +56,8 @@ In this assignment we had to write 8 functions:
   
   <br>
   
-  ![image](https://user-images.githubusercontent.com/79203360/164968099-dd9d26d0-03e8-4efe-a6fc-90fb5dce9a85.png)
+  ![image](https://user-images.githubusercontent.com/79203360/165152107-f7772da7-14ee-4373-9925-98b39329e30f.png)
+
 
 
 
