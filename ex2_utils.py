@@ -190,7 +190,7 @@ def blurImage1(in_image: np.ndarray, k_size: int) -> np.ndarray:
     # divide by its sum
     arr_new=arr_new/np.sum(arr_new)
     in_image=in_image*255
-    # create a new image using conv2d_reflect
+    # create a new image using conv2d
     img_new=conv2D(in_image, arr_new)
     img_new=img_new/255
     return img_new
@@ -474,16 +474,18 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     # if it is similar if the i j and r are all within min_radius/2 from a circle that exsits
     # if its in that area we will check if the difference is up to 3 away
     # if so we will update that entry in the list by averaging the values
+    thresholds=[]
     c = min_radius / 2
     for r in rad:
         a = arr[:, :, r]
         maxnum = np.max(a)
         if(maxnum>=middle):
-            cuutt=(maxnum+middle)/2
+            threshold=(maxnum+middle)/2
+            thresholds.append(threshold)
             for i in range(row):
                 for j in range(col):
                     x=arr[i][j][r]
-                    if (x >= cuutt):
+                    if (x >= threshold):
                         add = True
                         for z in range(len(listt)):
                             if (np.abs(listt[z][0] - j) <= c and np.abs(listt[z][1] - i) <= c and np.abs(listt[z][2] - r)<= c):
@@ -512,7 +514,8 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     for x in remove_list:
         del listt[x]
 
-    print(listt)
+    # print(listt)
+    print("best thresholds are:", thresholds)
     return listt
 
 
