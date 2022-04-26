@@ -110,7 +110,7 @@ def edgeDemoLOG():
 
 
 def edgeDemo():
-    edgeDemoSimple()
+    # edgeDemoSimple()
     edgeDemoLOG()
 
 
