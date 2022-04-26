@@ -552,7 +552,7 @@ def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: f
     colarr = np.arange(0, col, 1).astype(int)
     pad= math.floor(k_size/2)
     # creating a padded image
-    padded_image = cv2.copyMakeBorder(in_image, pad, pad, pad, pad, cv2.BORDER_REPLICATE, None, value=0)
+    padded_image = cv2.copyMakeBorder(in_image, pad, pad, pad, pad, cv2.BORDER_REFLECT_101, None, value=0).astype(int)
     image_new = np.zeros(shape)
 
     # creating a gaus kernel
@@ -567,10 +567,9 @@ def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: f
             neighbor_hood = padded_image[x :x + k_size ,
                                         y :y + k_size]
             diff = pivot_v - neighbor_hood
-            diff_gau = np.exp(-np.power(diff, 2) / (2 * sigma_color))
+            diff_gau = np.exp(-np.power(diff, 2) / (2 * sigma_color**2))
             combo = gaus * diff_gau
-            result = combo * neighbor_hood/ combo.sum()
-            ans=result.sum()
-            image_new[x][y]=ans
+            result = (combo * neighbor_hood).sum()/ combo.sum()
+            image_new[x][y]=result
 
     return cv_image,image_new
