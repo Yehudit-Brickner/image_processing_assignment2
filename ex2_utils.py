@@ -456,8 +456,10 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     # we will go through the 3d array and check the layers that the max value is the same as cutoff
     # we will go through those layers and if the pixels value is bigger or equal to cutoff we will add it to the list
     # when we wdd it to the list we will switch the i and j cordinates so that the middle of the circle is in the correct position in the picture
+    thresholds = []
     listt = []
     cutoff = maxes[-1] # biggest value in maxes
+    thresholds.append(cutoff)
     for r in rad:
         a = arr[:, :, r]
         maxnum = np.max(a)
@@ -474,7 +476,7 @@ def houghCircle(img: np.ndarray, min_radius: int, max_radius: int) -> list:
     # if it is similar if the i j and r are all within min_radius/2 from a circle that exsits
     # if its in that area we will check if the difference is up to 3 away
     # if so we will update that entry in the list by averaging the values
-    thresholds=[]
+
     c = min_radius / 2
     for r in rad:
         a = arr[:, :, r]
@@ -554,7 +556,7 @@ def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: f
     image_new = np.zeros(shape)
 
     # creating a gaus kernel
-    gaus = cv2.getGaussianKernel(k_size, sigma_space )
+    gaus = cv2.getGaussianKernel(k_size, sigma_space)
     gaus = gaus.dot(gaus.T)
 
     # creating all the kernels needed and combining them together and multiplying by the neighborhood
@@ -565,7 +567,7 @@ def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: f
             neighbor_hood = padded_image[x :x + k_size ,
                                         y :y + k_size]
             diff = pivot_v - neighbor_hood
-            diff_gau = np.exp(-np.power(diff, 2) / (2 *sigma_color))
+            diff_gau = np.exp(-np.power(diff, 2) / (2 * sigma_color))
             combo = gaus * diff_gau
             result = combo * neighbor_hood/ combo.sum()
             ans=result.sum()
