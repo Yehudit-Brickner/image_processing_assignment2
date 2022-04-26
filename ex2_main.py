@@ -1,4 +1,3 @@
-
 from ex2_utils import *
 import matplotlib.pyplot as plt
 import time
@@ -111,7 +110,7 @@ def edgeDemoLOG():
 
 
 def edgeDemo():
-    # edgeDemoSimple()
+    edgeDemoSimple()
     edgeDemoLOG()
 
 
@@ -155,8 +154,8 @@ def biliteralFilterDemo():
     cv2.imwrite("filtered_image_OpenCV.jpg", filtered_image_CV)
     cv2.imwrite("filtered_image_my.jpg", filtered_image_my)
 
-    print("MSE: {}".format(255 * MSE(filtered_image_my, filtered_image_CV)))
-    print("Max Error: {}".format(np.abs(filtered_image_my - filtered_image_CV).max() * 255))
+    print("MSE: {}".format(MSE(filtered_image_my, filtered_image_CV)))
+    print("Max Error: {}".format(np.abs(filtered_image_my - filtered_image_CV).max()))
 
 
 def main():
