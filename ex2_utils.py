@@ -543,7 +543,7 @@ def bilateral_filter_implement(in_image: np.ndarray, k_size: int, sigma_color: f
 
 
     # cv bilateral
-    cv_image = cv2.bilateralFilter(in_image, k_size, sigma_color, sigma_space)
+    cv_image = cv2.bilateralFilter(in_image, k_size, sigmaColor=sigma_color, sigmaSpace=sigma_space)
 
     shape = in_image.shape
     row = shape[0]
